@@ -17,8 +17,8 @@ fn main() {
 
 
 
-
     let mut model = mat4::identify(1.0);
+    
     let mut view = mat4::identify(1.0);
     let mut projection = mat4::ortho(10.0, 10.0, -10.0, -10.0, 200.0, -0.1);
 
@@ -71,7 +71,7 @@ fn main() {
         let mut target = display.draw();
         target.clear_color_and_depth((0.04, 0.09, 0.2, 1.0), 1.0);
 
-        model = mat4::trs(&vec3::new(0.0, 3.0, 0.0), &quat::from_angle_axis(t, &vec3::left()), &vec3::one());
+        model = mat4::trs(&vec3::new(0.0, 3.0, 0.0), &quat::from_angle_axis(t, &vec3::forward()), &vec3::one());
 
         let uniforms = uniform! {
             model: model.source,
