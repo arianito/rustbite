@@ -1,0 +1,10 @@
+[package]
+name = "core"
+version = "0.1.0"
+authors = ["Aryan <alikhaniaryan@live.com>"]
+
+
+[dependencies]
+glium = "*"
+pipeline = {path = "../pipeline"}
+math = {path = "../math"}
