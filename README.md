@@ -17,23 +17,28 @@ it is safe in memory and seg faults so? we are less concerned about memory leaka
 here are some modules i wrote first and they almost completed:
 
 
-math crate:
-  mat4 : matrices manupulation module! every game has a great one! everything you saw in the window are transform with matrices! built from ground up
-  vec3 : simple vector module! not actually simple im trying to implement good functional
-  quat : quaternion for rotation and other stuffs...
+**math crate:**
+
+**mat4** : matrices manupulation module! every game has a great one! everything you saw in the window are transform with matrices! built from ground up
+**vec3** : simple vector module! not actually simple im trying to implement good functional
+**quat** : quaternion for rotation and other stuffs...
   
 core crate:
+<br>
   this is the main application there is a simple window created by tomaka.github.io/glium crate, this is much like GLFW if you familiar with.
-  
   to start this you should clone the repo and cd to core
   then run cargo run
   
 
-` git clone https://github.com/ary4n/rust-game/ && cd core && cargo run `
+```
+git clone https://github.com/ary4n/rust-game/
+cd core
+cargo run
+```
 
-so here is the demo i was working on: 
+Screanshots: development in progress...
 
-project started:
-<img src="https://raw.githubusercontent.com/ary4n/rust-game/master/progress/screen1.png">
-now:
-<img src="https://raw.githubusercontent.com/ary4n/rust-game/master/progress/screen2.png">
+| project released | now |
+| --- | --- |
+|<img src="https://raw.githubusercontent.com/ary4n/rust-game/master/progress/screen1.png">|<img src="https://raw.githubusercontent.com/ary4n/rust-game/master/progress/screen2.png">|
+
