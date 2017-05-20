@@ -33,5 +33,7 @@ core crate:
 
 so here is the demo i was working on: 
 
+project started:
 <img src="https://raw.githubusercontent.com/ary4n/rust-game/master/progress/screen1.png">
+now:
 <img src="https://raw.githubusercontent.com/ary4n/rust-game/master/progress/screen2.png">
