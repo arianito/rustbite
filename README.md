@@ -33,4 +33,5 @@ core crate:
 
 so here is the demo i was working on: 
 
-<img src="https://raw.githubusercontent.com/ary4n/rust-game/master/Screen%20Shot%202017-05-19%20at%2011.51.08%20PM.png">
+<img src="https://raw.githubusercontent.com/ary4n/rust-game/master/progress/screen1.png">
+<img src="https://raw.githubusercontent.com/ary4n/rust-game/master/progress/screen2.png">

@@ -20,6 +20,7 @@ fn main() {
     let display = glium::glutin::WindowBuilder::new()
         .with_dimensions(600, 400)
         .with_multisampling(4)
+        .with_title("rust-game")
         .build_glium()
         .unwrap();
 

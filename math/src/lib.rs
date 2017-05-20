@@ -58,8 +58,8 @@ pub struct vec3 {
 impl std::ops::Add for vec3{
     type Output = vec3;
 
-    fn add(self, vec3: f32) -> vec3 {
-        vec3::add(&self, other)
+    fn add(self, other: vec3) -> vec3 {
+        vec3::add(&self, &other)
     }
 }
 
@@ -67,24 +67,8 @@ impl std::ops::Add for vec3{
 impl std::ops::Sub for vec3{
     type Output = vec3;
 
-    fn sub(self, vec3: f32) -> vec3 {
-        vec3::sub(&self, other)
-    }
-}
-
-impl std::ops::Mul for vec3{
-    type Output = vec3;
-
-    fn mul(self, other: f32) -> vec3 {
-        vec3::mul(&self, other)
-    }
-}
-
-impl std::ops::Div for vec3{
-    type Output = vec3;
-
-    fn div(self, other: f32) -> vec3 {
-        vec3::div(&self, other)
+    fn sub(self, other: vec3) -> vec3 {
+        vec3::sub(&self, &other)
     }
 }
 
