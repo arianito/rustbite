@@ -40,15 +40,10 @@ impl quat {
         let fTyy = fTy*self.source[1];
         let fTyz = fTz*self.source[1];
         let fTzz = fTz*self.source[2];
-
-        return mat4{
-            source: [
-                [1.0-(fTyy+fTzz), fTxy-fTwz, fTxz+fTwy, 0.0],
-                [fTxy+fTwz, 1.0-(fTxx+fTzz), fTyz-fTwx,0.0],
-                [fTxz-fTwy, fTyz+fTwx, 1.0-(fTxx+fTyy),0.0],
-                [0.0, 0.0, 0.0, 1.0],
-            ]
-        };
+        return mat4::new(1.0-(fTyy+fTzz), fTxy-fTwz, fTxz+fTwy, 0.0,
+                        fTxy+fTwz, 1.0-(fTxx+fTzz), fTyz-fTwx,0.0,
+                        fTxz-fTwy, fTyz+fTwx, 1.0-(fTxx+fTyy),0.0,
+                        0.0, 0.0, 0.0, 1.0);
     }
 }
 
