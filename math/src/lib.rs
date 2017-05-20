@@ -1,18 +1,21 @@
-pub static PI: f32 = std::f32::consts::PI;
-pub static HalfPI: f32 = std::f32::consts::FRAC_PI_2;
+pub static PI: f32 = 3.141592653589793_f32;
+pub static HalfPI: f32 = 1.570796326794896_f32;
+pub static Rad2Deg: f32 = 57.295779513082321_f32;
+pub static Deg2Rad: f32 = 0.017453292519943_f32;
 
 
 
 pub struct quat {
     pub source: [f32; 4]
 }
+
 impl quat {
 
     pub fn identify() -> quat{
         return quat {source: [0.0,0.0,0.0,10.0]};
     }
     pub fn from_angle_axis(degree: f32,axis: &vec3) -> quat{
-        let angle = (degree * self::PI / 180.0);
+        let angle = degree * self::Deg2Rad;
         let ha = 0.5*angle;
         let sn = ha.sin();
 
@@ -50,6 +53,42 @@ impl quat {
 pub struct vec3 {
     pub source: [f32; 3]
 }
+
+
+impl std::ops::Add for vec3{
+    type Output = vec3;
+
+    fn add(self, vec3: f32) -> vec3 {
+        vec3::add(&self, other)
+    }
+}
+
+
+impl std::ops::Sub for vec3{
+    type Output = vec3;
+
+    fn sub(self, vec3: f32) -> vec3 {
+        vec3::sub(&self, other)
+    }
+}
+
+impl std::ops::Mul for vec3{
+    type Output = vec3;
+
+    fn mul(self, other: f32) -> vec3 {
+        vec3::mul(&self, other)
+    }
+}
+
+impl std::ops::Div for vec3{
+    type Output = vec3;
+
+    fn div(self, other: f32) -> vec3 {
+        vec3::div(&self, other)
+    }
+}
+
+
 impl vec3 {
 
     // constants
@@ -161,6 +200,14 @@ pub struct mat4 {
     pub source: [[f32; 4]; 4]
 }
 
+impl std::ops::Mul for mat4{
+    type Output = mat4;
+
+    fn mul(self, other: mat4) -> mat4 {
+        mat4::mul(&self, &other)
+    }
+}
+
 impl mat4 {
     pub fn zero()->mat4{
         return mat4{
@@ -217,10 +264,7 @@ impl mat4 {
     }
 
     pub fn create_trs(position: &vec3, quaternion: &quat, scale: &vec3)->mat4{
-        let mut m = mat4::create_scale(&scale);
-        m.mul_by(&mat4::create_rotation(&quaternion));
-        m.mul_by(&mat4::create_translation(&position));
-        return m;
+        return mat4::create_scale(&scale) * mat4::create_rotation(&quaternion) * mat4::create_translation(&position);
     }
 
 

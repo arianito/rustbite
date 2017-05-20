@@ -4,17 +4,17 @@ extern crate math;
 extern crate pipeline;
 
 
+
 use math::vec3;
 use math::mat4;
 use math::quat;
 
 fn main() {
 
+    let mut mx: f32 = 0.0;
+    let mut my: f32 = 0.0;
 
-    let parent = mat4::create_trs(&vec3::one(), &quat::from_angle_axis(90.0, &vec3::forward()), &vec3::one());
-    let child = mat4::create_trs(&vec3::one(), &quat::from_angle_axis(90.0, &vec3::forward()), &vec3::one());
-
-   let model = mat4::create_trs(&vec3::new(0.0,0.0,0.0), &quat::identify(), &vec3::new(0.5,0.5,0.5));
+    let mut model = mat4::create_trs(&vec3::new(0.0,0.0,0.0), &quat::identify(), &vec3::new(0.5,0.5,0.5));
 
     use glium::{DisplayBuild, Surface};
     let display = glium::glutin::WindowBuilder::new()
@@ -25,8 +25,6 @@ fn main() {
 
 
     let mut view = mat4::identify(1.0);
-
-
     let mut projection = mat4::ortho_window(2.0, 6.0/4.0, 200.0, -0.1);
 
 
@@ -84,6 +82,8 @@ fn main() {
         let mut target = display.draw();
         target.clear_color_and_depth((0.04, 0.09, 0.2, 1.0), 1.0);
 
+        model = mat4::create_trs(&vec3::new(0.0,0.0,0.0), &quat::from_angle_axis((my/mx).atan() * math::Rad2Deg, &vec3::forward()), &vec3::new(0.5,0.5,0.5));
+
         let uniforms = uniform! {
             model: model.source,
             view: view.source,
@@ -108,6 +108,10 @@ fn main() {
                 glium::glutin::Event::Closed => return,
                 glium::glutin::Event::Resized(w, h) => {
                     projection = mat4::ortho_window(2.0, w as f32 / h as f32, 200.0, -0.1);
+                },
+                glium::glutin::Event::MouseMoved(x, y) => {
+                    mx = x as f32;
+                    my = y as f32;
                 },
                 _ => (),
             }
