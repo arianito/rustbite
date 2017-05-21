@@ -18,7 +18,7 @@ fn main() {
 
     use glium::{DisplayBuild, Surface};
     let display = glium::glutin::WindowBuilder::new()
-        .with_dimensions(600, 400)
+        .with_dimensions(400, 400)
         .with_multisampling(4)
         .with_title("rust-game")
         .build_glium()
@@ -26,7 +26,7 @@ fn main() {
 
 
     let mut view = mat4::identify(1.0);
-    let mut projection = mat4::ortho_window(2.0, 6.0/4.0, 200.0, -0.1);
+    let mut projection = mat4::ortho_window(2.0, 4.0/4.0, 200.0, -0.1);
 
 
     #[derive(Copy, Clone)]
