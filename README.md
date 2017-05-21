@@ -34,7 +34,7 @@ I tried many different languages for my project, and non of them was a good choi
 # How To Start?
 ```
 git clone https://github.com/ary4n/rust-game/
-cd core
+cd playground
 cargo run
 ```
 
