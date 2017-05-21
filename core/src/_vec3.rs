@@ -40,6 +40,16 @@ impl std::ops::Add for vec3{
 }
 
 
+
+impl std::ops::Div<f32> for vec3{
+    type Output = vec3;
+
+    fn div(self, other: f32) -> vec3 {
+        vec3::div(&self, other)
+    }
+}
+
+
 impl std::ops::Sub for vec3{
     type Output = vec3;
 

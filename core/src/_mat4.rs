@@ -2,6 +2,7 @@ use std;
 use _vec3::vec3;
 use _quat::quat;
 
+
 pub struct mat4 {
     pub source: [[f32; 4]; 4]
 }
@@ -10,7 +11,14 @@ impl std::ops::Mul for mat4{
     type Output = mat4;
 
     fn mul(self, other: mat4) -> mat4 {
-        mat4::mul(&self, &other)
+        mat4::mul_mat(&self, &other)
+    }
+}
+
+impl std::ops::Mul<vec3> for mat4{
+    type Output = vec3;
+    fn mul(self, other: vec3) -> vec3 {
+        mat4::mul_vec(&self, &other)
     }
 }
 
@@ -38,7 +46,7 @@ impl std::ops::Index<usize> for mat4 {
 
             41 => return &self.source[0][3],
             42 => return &self.source[1][3],
-            43 => return &self.source[2][2],
+            43 => return &self.source[2][3],
             44 => return &self.source[3][3],
             _ => return &self.source[0][0]
         }
@@ -68,7 +76,7 @@ impl std::ops::IndexMut<usize> for mat4 {
 
             41 => return &mut self.source[0][3],
             42 => return &mut self.source[1][3],
-            43 => return &mut self.source[2][2],
+            43 => return &mut self.source[2][3],
             44 => return &mut self.source[3][3],
 
             _ => return &mut self.source[0][0],
@@ -87,7 +95,10 @@ impl mat4 {
             ]
         };
     }
-    pub fn new(m11: f32, m12: f32, m13: f32, m14: f32, m21: f32, m22: f32, m23: f32, m24: f32,m31: f32,m32: f32,m33: f32, m34: f32,m41: f32,m42: f32,m43: f32, m44: f32)->mat4{
+    pub fn new(m11: f32, m12: f32, m13: f32, m14: f32,
+     m21: f32, m22: f32, m23: f32, m24: f32,
+     m31: f32,m32: f32,m33: f32, m34: f32,
+     m41: f32,m42: f32,m43: f32, m44: f32)->mat4{
         return mat4{
             source: [
                 [m11,m21,m31,m41],
@@ -178,75 +189,75 @@ impl mat4 {
             return mat4::identify(1.0);
         } else {
         return mat4::new(
-                lhs[22] * lhs[33] * lhs[44] + lhs[23] * lhs[34] * lhs[42] +
+                (lhs[22] * lhs[33] * lhs[44] + lhs[23] * lhs[34] * lhs[42] +
                 lhs[24] * lhs[32] * lhs[43] - lhs[22] * lhs[34] * lhs[43] -
-                lhs[23] * lhs[32] * lhs[44] - lhs[24] * lhs[33] * lhs[42],
+                lhs[23] * lhs[32] * lhs[44] - lhs[24] * lhs[33] * lhs[42])/det,
 
-                lhs[41] * lhs[34] * lhs[43] + lhs[42] * lhs[32] * lhs[44] +
-                lhs[43] * lhs[33] * lhs[42] - lhs[41] * lhs[33] * lhs[44] -
-                lhs[42] * lhs[34] * lhs[42] - lhs[43] * lhs[32] * lhs[43],
+                (lhs[12] * lhs[34] * lhs[43] + lhs[13] * lhs[32] * lhs[44] +
+                lhs[14] * lhs[33] * lhs[42] - lhs[12] * lhs[33] * lhs[44] -
+                lhs[13] * lhs[34] * lhs[42] - lhs[14] * lhs[32] * lhs[43])/det,
 
-                lhs[41] * lhs[23] * lhs[44] + lhs[42] * lhs[24] * lhs[42] +
-                lhs[43] * lhs[22] * lhs[43] - lhs[41] * lhs[24] * lhs[43] -
-                lhs[42] * lhs[22] * lhs[44] - lhs[43] * lhs[23] * lhs[42],
+                (lhs[12] * lhs[23] * lhs[44] + lhs[13] * lhs[24] * lhs[42] +
+                lhs[14] * lhs[22] * lhs[4314] - lhs[12] * lhs[24] * lhs[43] -
+                lhs[13] * lhs[22] * lhs[44] - lhs[14] * lhs[23] * lhs[42])/det,
 
-                lhs[41] * lhs[24] * lhs[33] + lhs[42] * lhs[22] * lhs[34] +
-                lhs[43] * lhs[23] * lhs[32] - lhs[41] * lhs[23] * lhs[34] -
-                lhs[42] * lhs[24] * lhs[32] - lhs[43] * lhs[22] * lhs[33],
+                (lhs[12] * lhs[24] * lhs[33] + lhs[13] * lhs[22] * lhs[34] +
+                lhs[14] * lhs[23] * lhs[32] - lhs[12] * lhs[23] * lhs[34] -
+                lhs[13] * lhs[24] * lhs[32] - lhs[14] * lhs[22] * lhs[33])/det,
 
-                lhs[21] * lhs[34] * lhs[43] + lhs[23] * lhs[31] * lhs[44] +
+                (lhs[21] * lhs[34] * lhs[43] + lhs[23] * lhs[31] * lhs[44] +
                 lhs[24] * lhs[33] * lhs[41] - lhs[21] * lhs[33] * lhs[44] -
-                lhs[23] * lhs[34] * lhs[41] - lhs[24] * lhs[31] * lhs[43],
+                lhs[23] * lhs[34] * lhs[41] - lhs[24] * lhs[31] * lhs[43])/det,
 
-                lhs[34] * lhs[33] * lhs[44] + lhs[42] * lhs[34] * lhs[41] +
-                lhs[43] * lhs[31] * lhs[43] - lhs[34] * lhs[34] * lhs[43] -
-                lhs[42] * lhs[31] * lhs[44] - lhs[43] * lhs[33] * lhs[41],
+                (lhs[11] * lhs[33] * lhs[44] + lhs[13] * lhs[34] * lhs[41] +
+                lhs[14] * lhs[31] * lhs[43] - lhs[11] * lhs[34] * lhs[43] -
+                lhs[13] * lhs[31] * lhs[44] - lhs[14] * lhs[33] * lhs[41])/det,
 
-                lhs[34] * lhs[24] * lhs[43] + lhs[42] * lhs[21] * lhs[44] +
-                lhs[43] * lhs[23] * lhs[41] - lhs[34] * lhs[23] * lhs[44] -
-                lhs[42] * lhs[24] * lhs[41] - lhs[43] * lhs[21] * lhs[43],
+                (lhs[11] * lhs[24] * lhs[43] + lhs[13] * lhs[21] * lhs[44] +
+                lhs[14] * lhs[23] * lhs[41] - lhs[11] * lhs[23] * lhs[44] -
+                lhs[13] * lhs[24] * lhs[41] - lhs[14] * lhs[21] * lhs[43])/det,
 
-                lhs[34] * lhs[23] * lhs[34] + lhs[42] * lhs[24] * lhs[31] +
-                lhs[43] * lhs[21] * lhs[33] - lhs[34] * lhs[24] * lhs[33] -
-                lhs[42] * lhs[21] * lhs[34] - lhs[43] * lhs[23] * lhs[31],
+                (lhs[11] * lhs[23] * lhs[34] + lhs[13] * lhs[24] * lhs[31] +
+                lhs[14] * lhs[21] * lhs[33] - lhs[11] * lhs[24] * lhs[33] -
+                lhs[13] * lhs[21] * lhs[34] - lhs[14] * lhs[23] * lhs[31])/det,
 
-                lhs[21] * lhs[32] * lhs[44] + lhs[22] * lhs[34] * lhs[41] +
+                (lhs[21] * lhs[32] * lhs[44] + lhs[22] * lhs[34] * lhs[41] +
                 lhs[24] * lhs[31] * lhs[42] - lhs[21] * lhs[34] * lhs[42] -
-                lhs[22] * lhs[31] * lhs[44] - lhs[24] * lhs[32] * lhs[41],
+                lhs[22] * lhs[31] * lhs[44] - lhs[24] * lhs[32] * lhs[41])/det,
 
-                lhs[34] * lhs[34] * lhs[42] + lhs[41] * lhs[31] * lhs[44] +
-                lhs[43] * lhs[32] * lhs[41] - lhs[34] * lhs[32] * lhs[44] -
-                lhs[41] * lhs[34] * lhs[41] - lhs[43] * lhs[31] * lhs[42],
+                (lhs[11] * lhs[34] * lhs[42] + lhs[12] * lhs[31] * lhs[44] +
+                lhs[14] * lhs[32] * lhs[41] - lhs[11] * lhs[32] * lhs[44] -
+                lhs[12] * lhs[34] * lhs[41] - lhs[14] * lhs[31] * lhs[42])/det,
 
-                lhs[34] * lhs[22] * lhs[44] + lhs[41] * lhs[24] * lhs[41] +
-                lhs[43] * lhs[21] * lhs[42] - lhs[34] * lhs[24] * lhs[42] -
-                lhs[41] * lhs[21] * lhs[44] - lhs[43] * lhs[22] * lhs[41],
+                (lhs[11] * lhs[22] * lhs[44] + lhs[12] * lhs[24] * lhs[41] +
+                lhs[14] * lhs[21] * lhs[42] - lhs[11] * lhs[24] * lhs[42] -
+                lhs[12] * lhs[21] * lhs[44] - lhs[14] * lhs[22] * lhs[41])/det,
 
-                lhs[34] * lhs[24] * lhs[32] + lhs[41] * lhs[21] * lhs[34] +
-                lhs[43] * lhs[22] * lhs[31] - lhs[34] * lhs[22] * lhs[34] -
-                lhs[41] * lhs[24] * lhs[31] - lhs[43] * lhs[21] * lhs[32],
+                (lhs[11] * lhs[24] * lhs[32] + lhs[12] * lhs[21] * lhs[34] +
+                lhs[14] * lhs[22] * lhs[31] - lhs[11] * lhs[22] * lhs[34] -
+                lhs[12] * lhs[24] * lhs[31] - lhs[14] * lhs[21] * lhs[32])/det,
 
-                lhs[21] * lhs[33] * lhs[42] + lhs[22] * lhs[31] * lhs[43] +
+                (lhs[21] * lhs[33] * lhs[42] + lhs[22] * lhs[31] * lhs[43] +
                 lhs[23] * lhs[32] * lhs[41] - lhs[21] * lhs[32] * lhs[43] -
-                lhs[22] * lhs[33] * lhs[41] - lhs[23] * lhs[31] * lhs[42],
+                lhs[22] * lhs[33] * lhs[41] - lhs[23] * lhs[31] * lhs[42])/det,
 
-                lhs[34] * lhs[32] * lhs[43] + lhs[41] * lhs[33] * lhs[41] +
-                lhs[42] * lhs[31] * lhs[42] - lhs[34] * lhs[33] * lhs[42] -
-                lhs[41] * lhs[31] * lhs[43] - lhs[42] * lhs[32] * lhs[41],
+                (lhs[11] * lhs[32] * lhs[43] + lhs[12] * lhs[33] * lhs[41] +
+                lhs[13] * lhs[31] * lhs[42] - lhs[11] * lhs[33] * lhs[42] -
+                lhs[12] * lhs[31] * lhs[43] - lhs[13] * lhs[32] * lhs[41])/det,
 
-                lhs[34] * lhs[23] * lhs[42] + lhs[41] * lhs[21] * lhs[43] +
-                lhs[42] * lhs[22] * lhs[41] - lhs[34] * lhs[22] * lhs[43] -
-                lhs[41] * lhs[23] * lhs[41] - lhs[42] * lhs[21] * lhs[42],
+                (lhs[11] * lhs[23] * lhs[42] + lhs[12] * lhs[21] * lhs[43] +
+                lhs[13] * lhs[22] * lhs[41] - lhs[11] * lhs[22] * lhs[43] -
+                lhs[12] * lhs[23] * lhs[41] - lhs[13] * lhs[21] * lhs[42])/det,
 
-                lhs[34] * lhs[22] * lhs[33] + lhs[41] * lhs[23] * lhs[31] +
-                lhs[42] * lhs[21] * lhs[32] - lhs[34] * lhs[23] * lhs[32] -
-                lhs[41] * lhs[21] * lhs[33] - lhs[42] * lhs[22] * lhs[31]
+                (lhs[11] * lhs[22] * lhs[33] + lhs[12] * lhs[23] * lhs[31] +
+                lhs[13] * lhs[21] * lhs[32] - lhs[11] * lhs[23] * lhs[32] -
+                lhs[12] * lhs[21] * lhs[33] - lhs[13] * lhs[22] * lhs[31])/det
             );
         }
     }
 
 
-    pub fn mul(lhs: &mat4, rhs: &mat4) -> mat4 {
+    pub fn mul_mat(lhs: &mat4, rhs: &mat4) -> mat4 {
         return mat4::new(
                 lhs[11]*rhs[11]+
                 lhs[12]*rhs[21]+
@@ -337,20 +348,20 @@ impl mat4 {
                 lhs[13]*rhs[3]+
                 lhs[14],
 
-                lhs[11]*rhs[1]+
-                lhs[12]*rhs[2]+
-                lhs[13]*rhs[3]+
-                lhs[14],
+                lhs[21]*rhs[1]+
+                lhs[22]*rhs[2]+
+                lhs[23]*rhs[3]+
+                lhs[24],
 
-                lhs[11]*rhs[1]+
-                lhs[12]*rhs[2]+
-                lhs[13]*rhs[3]+
-                lhs[14]);
+                lhs[31]*rhs[1]+
+                lhs[32]*rhs[2]+
+                lhs[33]*rhs[3]+
+                lhs[34]);
     }
 
     pub fn div(lhs: &mat4, rhs: &mat4) -> mat4 {
         let m2 = mat4::inverse(&rhs);
-        return mat4::mul(&lhs, &m2);
+        return mat4::mul_mat(&lhs, &m2);
     }
 
     pub fn ortho(top: f32, right: f32, bottom: f32, left: f32, near: f32, far: f32)->mat4{
@@ -374,6 +385,17 @@ impl mat4 {
     }
 
 
+    // debug
+    pub fn clone(&self) -> mat4{
+        return mat4{
+            source: [
+                [self.source[0][0], self.source[0][1],self.source[0][2],self.source[0][3]],
+                [self.source[1][0], self.source[1][1],self.source[1][2],self.source[1][3]],
+                [self.source[2][0], self.source[2][1],self.source[2][2],self.source[2][3]],
+                [self.source[3][0], self.source[3][1],self.source[3][2],self.source[3][3]],
+            ]
+        };
+    }
     // debug
     pub fn print(&self) {
         println!("{:?}", self.source);

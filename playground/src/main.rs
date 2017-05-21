@@ -10,21 +10,25 @@ use core::{
 fn main() {
 
 
-    let qz = quat::from_angle_axis(90.0, &vec3::forward());
+    let mtz = mat4::new(2.0,5.0,0.0,0.0,
+                        0.0,0.0,1.0,0.0,
+                        1.0,0.0,7.0,0.0,
+                        0.0,0.0,0.0,8.0);
 
-    qz.print();
-
-
-    quat::from_roatation_matrix(&qz.to_rotation_matrix()).print();
+    (mat4::inverse(&mtz) * mtz.clone()).print();
 
     let mut mx: f32 = 0.0;
     let mut my: f32 = 0.0;
+
+
+    let mut sw: f32 = 500.0;
+    let mut sh: f32 = 500.0;
 
     let mut model: mat4;
 
     use glium::{DisplayBuild, Surface};
     let display = glium::glutin::WindowBuilder::new()
-        .with_dimensions(400, 400)
+        .with_dimensions(sw as u32, sh as u32)
         .with_multisampling(4)
         .with_title("rust-game")
         .build_glium()
@@ -32,7 +36,7 @@ fn main() {
 
 
     let view = mat4::identify(1.0);
-    let mut projection = mat4::ortho_window(2.0, 4.0/4.0, 200.0, -0.1);
+    let mut projection = mat4::ortho_window(2.0, sw/sh, 200.0, -0.1);
 
 
     #[derive(Copy, Clone)]
@@ -89,9 +93,10 @@ fn main() {
         let mut target = display.draw();
         target.clear_color_and_depth((0.04, 0.09, 0.2, 1.0), 1.0);
 
-        
-        
-        model = mat4::create_trs(&vec3::new(mx/100.0, -my/100.0,0.0), &quat::identify(), &vec3::one());
+        let mvc = vec3::new(mx/sw*2.0-2.0, -my/sh*2.0+2.0, 0.0);
+
+        model = mat4::create_trs(&mvc, &quat::identify(), &vec3::one());
+    
 
         let uniforms = uniform! {
             model: model.source,
@@ -116,6 +121,8 @@ fn main() {
             match ev {
                 glium::glutin::Event::Closed => return,
                 glium::glutin::Event::Resized(w, h) => {
+                    sw = w as f32;
+                    sh = h as f32;
                     projection = mat4::ortho_window(2.0, w as f32 / h as f32, 200.0, -0.1);
                 },
                 glium::glutin::Event::MouseMoved(x, y) => {
