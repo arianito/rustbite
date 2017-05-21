@@ -1,35 +1,35 @@
-# hello everyone - welcome to project rust-game
-in the early past 10 years i was very passionate about building my own game, so i tried many different game engines
-and source codes i read them play with them but you know most of them were very complete at their own ways and they were very mature!
-i can't deny that they all great! but i found that they are really big for some people like me.
-i really like to build my game very simple and clean there should be a structure that you could read!
-the pattern that you could understand, when they become larger and larger they become heavier to understand and
-for those who want to just write a game they are great, but i think writing a game is an art and we should pay much attention on it,
+# Welcome To Project rust-game
+In the past 10 years I was very passionate about building my own game, so I tried many different game engines, I tried them, played with them, build tiny games with them, but you know they are very complete and very mature and well architected! I can't deny that they're all great!
+but I really like to build my game very simple and clean there should be a structure for engine that you could read! the game pattern that you could understand, when game engines become larger and larger they become heavier to understand, I'm trying to build a game engine as simple as possible so everybody could understand it and be able to efficiently scale it and make it larger but it should keep it's simplicity. for those who just want to make a game, todays game engine are just okay.
 
-so we are building an game engine from ground up here and i'm really focusing on it that anyone who came here to learn somthing from computer graphics, mathematics and other stuffs, also, i am really honored to start this project in github.
+So, we are building a game engine here and I'm willing that everybody who came here, learn something, share some code, and become more knowledged about computer graphics, mathematics and other cool stuffs, also, I am really honored to start this project on GITHUB.
 
-about the RUST!
-i've tried many different languages for my project that non of them was the choice and i always failed with them, like c++ (really great choice but you have to be an expert with memory allocations), java (seriously it runs on every machine but it needs jre), c# (only windows i guess? and monogame? i tried xna in old times), js (were not building game for web browsers!), ...
-so now that new language rust has come i found it interesting to build my game,
-it is safe in memory and seg faults so? we are less concerned about memory leakage in game and we focuse more on building somthing great!
+# Why RUST-LANG?
+I tried many different languages for my project, and non of them was a good choice and i always failed because there was always and block in my way, 
+
+| language | reason to reconsider | why rust?|
+| --- | --- | --- |
+| c++ | really great choice but you have to be an expert with memory allocations | rust can be both safe and fast |
+| java | seriously it runs on every machine but it needs jre, it is not native! and works with GC! | rust have better memory management and efficiency |
+| c#, dotnet | only windows i guess? and monogame? i tried xna in old times | rust provide cross platform compiling |
+| js | were not building game for web browsers! | this is a poor review i know :( |
+
+* with rust you are less concerned about memory and instead you can build something great.
 
 
-here are some modules i wrote first and they almost completed:
+| crate | use case |
+| --- | --- |
+| math::mat4 | matrices manupulation module! every game has a great one! everything you saw in the window are transform with matrices!|
+| math::vec3 | simple vector module! you know what vector is ?|
+| math::quat | quaternion of rotation, used when you want to rotate something in screen |
 
 
-**math crate:**
-
-**mat4** : matrices manupulation module! every game has a great one! everything you saw in the window are transform with matrices! built from ground up
-**vec3** : simple vector module! not actually simple im trying to implement good functional
-**quat** : quaternion for rotation and other stuffs...
+| crate | use case |
+| --- | --- |
+| core::main | this is the main application, there is a simple window created by "tomaka.github.io/glium" crate, much like GLFW if you familiar with. |
   
-core crate:
-<br>
-  this is the main application there is a simple window created by tomaka.github.io/glium crate, this is much like GLFW if you familiar with.
-  to start this you should clone the repo and cd to core
-  then run cargo run
-  
 
+# How To Start?
 ```
 git clone https://github.com/ary4n/rust-game/
 cd core

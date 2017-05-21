@@ -83,7 +83,7 @@ fn main() {
         let mut target = display.draw();
         target.clear_color_and_depth((0.04, 0.09, 0.2, 1.0), 1.0);
 
-        model = mat4::create_trs(&vec3::new(0.0,0.0,0.0), &quat::from_angle_axis((my/mx).atan() * math::Rad2Deg, &vec3::forward()), &vec3::new(0.5,0.5,0.5));
+        model = mat4::create_trs(&vec3::new(0.0,0.0,0.0), &quat::from_angle_axis((my/mx).atan() * math::Rad2Deg, &vec3::forward()), &vec3::one());
 
         let uniforms = uniform! {
             model: model.source,
