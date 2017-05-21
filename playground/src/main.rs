@@ -1,20 +1,18 @@
 #[macro_use]
 extern crate glium;
-extern crate math;
-extern crate pipeline;
+extern crate core;
 
 
-
-use math::vec3;
-use math::mat4;
-use math::quat;
+use core::{
+    vec3, mat4, quat
+};
 
 fn main() {
 
     let mut mx: f32 = 0.0;
     let mut my: f32 = 0.0;
 
-    let mut model = mat4::create_trs(&vec3::new(0.0,0.0,0.0), &quat::identify(), &vec3::new(0.5,0.5,0.5));
+    let mut model: mat4;
 
     use glium::{DisplayBuild, Surface};
     let display = glium::glutin::WindowBuilder::new()
@@ -25,7 +23,7 @@ fn main() {
         .unwrap();
 
 
-    let mut view = mat4::identify(1.0);
+    let view = mat4::identify(1.0);
     let mut projection = mat4::ortho_window(2.0, 4.0/4.0, 200.0, -0.1);
 
 
@@ -83,7 +81,7 @@ fn main() {
         let mut target = display.draw();
         target.clear_color_and_depth((0.04, 0.09, 0.2, 1.0), 1.0);
 
-        model = mat4::create_trs(&vec3::new(0.0,0.0,0.0), &quat::from_angle_axis((my/mx).atan() * math::Rad2Deg, &vec3::forward()), &vec3::one());
+        model = mat4::create_trs(&vec3::new(0.0,0.0,0.0), &quat::from_angle_axis((my/mx).atan() * core::RAD2_DEG, &vec3::forward()), &vec3::one());
 
         let uniforms = uniform! {
             model: model.source,
