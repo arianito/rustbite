@@ -14,6 +14,68 @@ impl std::ops::Mul for mat4{
     }
 }
 
+
+impl std::ops::Index<usize> for mat4 {
+     type Output = f32;
+
+     fn index(&self, idx: usize) -> &f32 {
+        match idx {
+            11 => return &self.source[0][0],
+            12 => return &self.source[1][0],
+            13 => return &self.source[2][0],
+            14 => return &self.source[3][0],
+
+            21 => return &self.source[0][1],
+            22 => return &self.source[1][1],
+            23 => return &self.source[2][1],
+            24 => return &self.source[3][1],
+
+
+            31 => return &self.source[0][2],
+            32 => return &self.source[1][2],
+            33 => return &self.source[2][2],
+            34 => return &self.source[3][2],
+
+            41 => return &self.source[0][3],
+            42 => return &self.source[1][3],
+            43 => return &self.source[2][2],
+            44 => return &self.source[3][3],
+            _ => return &self.source[0][0]
+        }
+    }
+}
+
+
+impl std::ops::IndexMut<usize> for mat4 {
+
+     fn index_mut(&mut self, idx: usize) -> &mut f32 {
+        match idx {
+            11 => return &mut self.source[0][0],
+            12 => return &mut self.source[1][0],
+            13 => return &mut self.source[2][0],
+            14 => return &mut self.source[3][0],
+
+            21 => return &mut self.source[0][1],
+            22 => return &mut self.source[1][1],
+            23 => return &mut self.source[2][1],
+            24 => return &mut self.source[3][1],
+
+
+            31 => return &mut self.source[0][2],
+            32 => return &mut self.source[1][2],
+            33 => return &mut self.source[2][2],
+            34 => return &mut self.source[3][2],
+
+            41 => return &mut self.source[0][3],
+            42 => return &mut self.source[1][3],
+            43 => return &mut self.source[2][2],
+            44 => return &mut self.source[3][3],
+
+            _ => return &mut self.source[0][0],
+        }
+    }
+}
+
 impl mat4 {
     pub fn zero()->mat4{
         return mat4{
@@ -51,7 +113,7 @@ impl mat4 {
                 [1.0f32, 0.0f32, 0.0f32, 0.0],
                 [0.0f32, 1.0f32, 0.0f32, 0.0],
                 [0.0f32, 0.0f32, 1.0f32, 0.0],
-                [a.source[0], a.source[1], a.source[2], 1.0f32]
+                [a[1], a[2], a[3], 1.0f32]
             ]
         };
     }
@@ -61,9 +123,9 @@ impl mat4 {
     pub fn create_scale(a: &vec3)->mat4{
         return mat4{
             source: [
-                [a.source[0], 0.0f32  , 0.0f32, 0.0f32],
-                [0.0f32    , a.source[1], 0.0f32, 0.0f32],
-                [0.0f32    , 0.0f32  , a.source[2], 0.0f32],
+                [a[1], 0.0f32  , 0.0f32, 0.0f32],
+                [0.0f32    , a[2], 0.0f32, 0.0f32],
+                [0.0f32    , 0.0f32  , a[3], 0.0f32],
                 [0.0f32    , 0.0f32  , 0.0f32, 1.0f32]
             ]
         };
@@ -74,203 +136,222 @@ impl mat4 {
     }
 
 
-    pub fn mul_by(&mut self, rhs: &mat4)->&mut mat4{
-        self.source =  mat4::mul(&self, &rhs).source;
-        return self;
-    }
-
     pub fn determinant(lhs: &mat4) -> f32 {
-        return lhs.source[0][0] * lhs.source[1][1] * lhs.source[2][2] * lhs.source[3][3] -
-        lhs.source[0][0] * lhs.source[1][1] * lhs.source[3][2] * lhs.source[2][3] -
-        lhs.source[0][0] * lhs.source[2][1] * lhs.source[1][2] * lhs.source[3][3] +
-        lhs.source[0][0] * lhs.source[2][1] * lhs.source[3][2] * lhs.source[1][3] +
-        lhs.source[0][0] * lhs.source[3][1] * lhs.source[1][2] * lhs.source[2][3] -
-        lhs.source[0][0] * lhs.source[3][1] * lhs.source[2][2] * lhs.source[1][3] -
-        lhs.source[1][0] * lhs.source[0][1] * lhs.source[2][2] * lhs.source[3][3] +
-        lhs.source[1][0] * lhs.source[0][1] * lhs.source[3][2] * lhs.source[2][3] +
-        lhs.source[1][0] * lhs.source[2][1] * lhs.source[2][0] * lhs.source[3][3] -
-        lhs.source[1][0] * lhs.source[2][1] * lhs.source[3][2] * lhs.source[0][3] -
-        lhs.source[1][0] * lhs.source[3][1] * lhs.source[2][0] * lhs.source[2][3] +
-        lhs.source[1][0] * lhs.source[3][1] * lhs.source[2][2] * lhs.source[0][3] +
-        lhs.source[2][0] * lhs.source[0][1] * lhs.source[1][2] * lhs.source[3][3] -
-        lhs.source[2][0] * lhs.source[0][1] * lhs.source[3][2] * lhs.source[1][3] -
-        lhs.source[2][0] * lhs.source[1][1] * lhs.source[2][0] * lhs.source[3][3] +
-        lhs.source[2][0] * lhs.source[1][1] * lhs.source[3][2] * lhs.source[0][3] +
-        lhs.source[2][0] * lhs.source[3][1] * lhs.source[2][0] * lhs.source[1][3] -
-        lhs.source[2][0] * lhs.source[3][1] * lhs.source[1][2] * lhs.source[0][3] -
-        lhs.source[3][0] * lhs.source[0][1] * lhs.source[1][2] * lhs.source[2][3] +
-        lhs.source[3][0] * lhs.source[0][1] * lhs.source[2][2] * lhs.source[1][3] +
-        lhs.source[3][0] * lhs.source[1][1] * lhs.source[2][0] * lhs.source[2][3] -
-        lhs.source[3][0] * lhs.source[1][1] * lhs.source[2][2] * lhs.source[0][3] -
-        lhs.source[3][0] * lhs.source[2][1] * lhs.source[2][0] * lhs.source[1][3] +
-        lhs.source[3][0] * lhs.source[2][1] * lhs.source[1][2] * lhs.source[0][3];
+        return  lhs[11] * lhs[22] * lhs[33] * lhs[44] -
+                lhs[11] * lhs[22] * lhs[34] * lhs[43] -
+                lhs[11] * lhs[23] * lhs[32] * lhs[44] +
+                lhs[11] * lhs[23] * lhs[34] * lhs[42] +
+                lhs[11] * lhs[24] * lhs[32] * lhs[43] -
+                lhs[11] * lhs[24] * lhs[33] * lhs[42] -
+                lhs[12] * lhs[21] * lhs[33] * lhs[44] +
+                lhs[12] * lhs[21] * lhs[34] * lhs[43] +
+                lhs[12] * lhs[23] * lhs[31] * lhs[44] -
+                lhs[12] * lhs[23] * lhs[34] * lhs[41] -
+                lhs[12] * lhs[24] * lhs[31] * lhs[43] +
+                lhs[12] * lhs[24] * lhs[33] * lhs[41] +
+                lhs[13] * lhs[21] * lhs[32] * lhs[44] -
+                lhs[13] * lhs[21] * lhs[34] * lhs[42] -
+                lhs[13] * lhs[22] * lhs[31] * lhs[44] +
+                lhs[13] * lhs[22] * lhs[34] * lhs[41] +
+                lhs[13] * lhs[24] * lhs[31] * lhs[42] -
+                lhs[13] * lhs[24] * lhs[32] * lhs[41] -
+                lhs[14] * lhs[21] * lhs[32] * lhs[43] +
+                lhs[14] * lhs[21] * lhs[33] * lhs[42] +
+                lhs[14] * lhs[22] * lhs[31] * lhs[43] -
+                lhs[14] * lhs[22] * lhs[33] * lhs[41] -
+                lhs[14] * lhs[23] * lhs[31] * lhs[42] +
+                lhs[14] * lhs[23] * lhs[32] * lhs[41];
     }
 
     pub fn transpose(lhs: &mat4) -> mat4 {
         return mat4::new(
-            lhs.source[0][0], lhs.source[0][1], lhs.source[2][0], lhs.source[0][3],
-            lhs.source[1][0], lhs.source[1][1], lhs.source[1][2], lhs.source[1][3],
-            lhs.source[2][0], lhs.source[2][1], lhs.source[2][2], lhs.source[2][3],
-            lhs.source[3][0], lhs.source[3][1], lhs.source[3][2], lhs.source[3][3]
+            lhs[11],lhs[21],lhs[31],lhs[41],
+            lhs[12],lhs[22],lhs[32],lhs[42],
+            lhs[13],lhs[23],lhs[33],lhs[43],
+            lhs[14],lhs[24],lhs[34],lhs[44],
         );
     }
 
     pub fn inverse(lhs: &mat4) -> mat4 {
-        let mut m = mat4::identify(1.0f32);
         let det = mat4::determinant(&lhs);
         if det == 0.0 {
-            return m;
+            return mat4::identify(1.0);
+        } else {
+        return mat4::new(
+                lhs[22] * lhs[33] * lhs[44] + lhs[23] * lhs[34] * lhs[42] +
+                lhs[24] * lhs[32] * lhs[43] - lhs[22] * lhs[34] * lhs[43] -
+                lhs[23] * lhs[32] * lhs[44] - lhs[24] * lhs[33] * lhs[42],
+
+                lhs[41] * lhs[34] * lhs[43] + lhs[42] * lhs[32] * lhs[44] +
+                lhs[43] * lhs[33] * lhs[42] - lhs[41] * lhs[33] * lhs[44] -
+                lhs[42] * lhs[34] * lhs[42] - lhs[43] * lhs[32] * lhs[43],
+
+                lhs[41] * lhs[23] * lhs[44] + lhs[42] * lhs[24] * lhs[42] +
+                lhs[43] * lhs[22] * lhs[43] - lhs[41] * lhs[24] * lhs[43] -
+                lhs[42] * lhs[22] * lhs[44] - lhs[43] * lhs[23] * lhs[42],
+
+                lhs[41] * lhs[24] * lhs[33] + lhs[42] * lhs[22] * lhs[34] +
+                lhs[43] * lhs[23] * lhs[32] - lhs[41] * lhs[23] * lhs[34] -
+                lhs[42] * lhs[24] * lhs[32] - lhs[43] * lhs[22] * lhs[33],
+
+                lhs[21] * lhs[34] * lhs[43] + lhs[23] * lhs[31] * lhs[44] +
+                lhs[24] * lhs[33] * lhs[41] - lhs[21] * lhs[33] * lhs[44] -
+                lhs[23] * lhs[34] * lhs[41] - lhs[24] * lhs[31] * lhs[43],
+
+                lhs[34] * lhs[33] * lhs[44] + lhs[42] * lhs[34] * lhs[41] +
+                lhs[43] * lhs[31] * lhs[43] - lhs[34] * lhs[34] * lhs[43] -
+                lhs[42] * lhs[31] * lhs[44] - lhs[43] * lhs[33] * lhs[41],
+
+                lhs[34] * lhs[24] * lhs[43] + lhs[42] * lhs[21] * lhs[44] +
+                lhs[43] * lhs[23] * lhs[41] - lhs[34] * lhs[23] * lhs[44] -
+                lhs[42] * lhs[24] * lhs[41] - lhs[43] * lhs[21] * lhs[43],
+
+                lhs[34] * lhs[23] * lhs[34] + lhs[42] * lhs[24] * lhs[31] +
+                lhs[43] * lhs[21] * lhs[33] - lhs[34] * lhs[24] * lhs[33] -
+                lhs[42] * lhs[21] * lhs[34] - lhs[43] * lhs[23] * lhs[31],
+
+                lhs[21] * lhs[32] * lhs[44] + lhs[22] * lhs[34] * lhs[41] +
+                lhs[24] * lhs[31] * lhs[42] - lhs[21] * lhs[34] * lhs[42] -
+                lhs[22] * lhs[31] * lhs[44] - lhs[24] * lhs[32] * lhs[41],
+
+                lhs[34] * lhs[34] * lhs[42] + lhs[41] * lhs[31] * lhs[44] +
+                lhs[43] * lhs[32] * lhs[41] - lhs[34] * lhs[32] * lhs[44] -
+                lhs[41] * lhs[34] * lhs[41] - lhs[43] * lhs[31] * lhs[42],
+
+                lhs[34] * lhs[22] * lhs[44] + lhs[41] * lhs[24] * lhs[41] +
+                lhs[43] * lhs[21] * lhs[42] - lhs[34] * lhs[24] * lhs[42] -
+                lhs[41] * lhs[21] * lhs[44] - lhs[43] * lhs[22] * lhs[41],
+
+                lhs[34] * lhs[24] * lhs[32] + lhs[41] * lhs[21] * lhs[34] +
+                lhs[43] * lhs[22] * lhs[31] - lhs[34] * lhs[22] * lhs[34] -
+                lhs[41] * lhs[24] * lhs[31] - lhs[43] * lhs[21] * lhs[32],
+
+                lhs[21] * lhs[33] * lhs[42] + lhs[22] * lhs[31] * lhs[43] +
+                lhs[23] * lhs[32] * lhs[41] - lhs[21] * lhs[32] * lhs[43] -
+                lhs[22] * lhs[33] * lhs[41] - lhs[23] * lhs[31] * lhs[42],
+
+                lhs[34] * lhs[32] * lhs[43] + lhs[41] * lhs[33] * lhs[41] +
+                lhs[42] * lhs[31] * lhs[42] - lhs[34] * lhs[33] * lhs[42] -
+                lhs[41] * lhs[31] * lhs[43] - lhs[42] * lhs[32] * lhs[41],
+
+                lhs[34] * lhs[23] * lhs[42] + lhs[41] * lhs[21] * lhs[43] +
+                lhs[42] * lhs[22] * lhs[41] - lhs[34] * lhs[22] * lhs[43] -
+                lhs[41] * lhs[23] * lhs[41] - lhs[42] * lhs[21] * lhs[42],
+
+                lhs[34] * lhs[22] * lhs[33] + lhs[41] * lhs[23] * lhs[31] +
+                lhs[42] * lhs[21] * lhs[32] - lhs[34] * lhs[23] * lhs[32] -
+                lhs[41] * lhs[21] * lhs[33] - lhs[42] * lhs[22] * lhs[31]
+            );
         }
-        m.source = [[
-        (lhs.source[1][1] * lhs.source[2][2] * lhs.source[3][3]+lhs.source[2][1] * lhs.source[3][2] * lhs.source[1][3] +
-        lhs.source[3][1] * lhs.source[1][2] * lhs.source[2][3] - lhs.source[1][1] * lhs.source[3][2] * lhs.source[2][3] -
-        lhs.source[2][1] * lhs.source[1][2] * lhs.source[3][3] - lhs.source[3][1] * lhs.source[2][2] * lhs.source[1][3])/det,
-        (lhs.source[1][0] * lhs.source[3][2] * lhs.source[2][3]+lhs.source[2][0] * lhs.source[1][2] * lhs.source[3][3] +
-        lhs.source[3][0] * lhs.source[2][2] * lhs.source[1][3] - lhs.source[1][0] * lhs.source[2][2] * lhs.source[3][3] -
-        lhs.source[2][0] * lhs.source[3][2] * lhs.source[1][3] - lhs.source[3][0] * lhs.source[1][2] * lhs.source[2][3])/det,
-        (lhs.source[1][0] * lhs.source[2][1] * lhs.source[3][3]+lhs.source[2][0] * lhs.source[3][1] * lhs.source[1][3] +
-        lhs.source[3][0] * lhs.source[1][1] * lhs.source[2][3] - lhs.source[1][0] * lhs.source[3][1] * lhs.source[2][3] -
-        lhs.source[2][0] * lhs.source[1][1] * lhs.source[3][3] - lhs.source[3][0] * lhs.source[2][1] * lhs.source[1][3])/det,
-        (lhs.source[1][0] * lhs.source[3][1] * lhs.source[2][2]+lhs.source[2][0] * lhs.source[1][1] * lhs.source[3][2] +
-        lhs.source[3][0] * lhs.source[2][1] * lhs.source[1][2] - lhs.source[1][0] * lhs.source[2][1] * lhs.source[3][2] -
-        lhs.source[2][0] * lhs.source[3][1] * lhs.source[1][2] - lhs.source[3][0] * lhs.source[1][1] * lhs.source[2][2])/det],
-        [(lhs.source[0][1] * lhs.source[3][2] * lhs.source[2][3]+lhs.source[2][1] * lhs.source[2][0] * lhs.source[3][3] +
-        lhs.source[3][1] * lhs.source[2][2] * lhs.source[0][3] - lhs.source[0][1] * lhs.source[2][2] * lhs.source[3][3] -
-        lhs.source[2][1] * lhs.source[3][2] * lhs.source[0][3] - lhs.source[3][1] * lhs.source[2][0] * lhs.source[2][3])/det,
-        (lhs.source[0][0] * lhs.source[2][2] * lhs.source[3][3]+lhs.source[2][0] * lhs.source[3][2] * lhs.source[0][3] +
-        lhs.source[3][0] * lhs.source[2][0] * lhs.source[2][3] - lhs.source[0][0] * lhs.source[3][2] * lhs.source[2][3] -
-        lhs.source[2][0] * lhs.source[2][0] * lhs.source[3][3] - lhs.source[3][0] * lhs.source[2][2] * lhs.source[0][3])/det,
-        (lhs.source[0][0] * lhs.source[3][1] * lhs.source[2][3]+lhs.source[2][0] * lhs.source[0][1] * lhs.source[3][3] +
-        lhs.source[3][0] * lhs.source[2][1] * lhs.source[0][3] - lhs.source[0][0] * lhs.source[2][1] * lhs.source[3][3] -
-        lhs.source[2][0] * lhs.source[3][1] * lhs.source[0][3] - lhs.source[3][0] * lhs.source[0][1] * lhs.source[2][3])/det,
-        (lhs.source[0][0] * lhs.source[2][1] * lhs.source[3][2]+lhs.source[2][0] * lhs.source[3][1] * lhs.source[2][0] +
-        lhs.source[3][0] * lhs.source[0][1] * lhs.source[2][2] - lhs.source[0][0] * lhs.source[3][1] * lhs.source[2][2] -
-        lhs.source[2][0] * lhs.source[0][1] * lhs.source[3][2] - lhs.source[3][0] * lhs.source[2][1] * lhs.source[2][0])/det],
-        [(lhs.source[0][1] * lhs.source[1][2] * lhs.source[3][3]+lhs.source[1][1] * lhs.source[3][2] * lhs.source[0][3] +
-        lhs.source[3][1] * lhs.source[2][0] * lhs.source[1][3] - lhs.source[0][1] * lhs.source[3][2] * lhs.source[1][3] -
-        lhs.source[1][1] * lhs.source[2][0] * lhs.source[3][3] - lhs.source[3][1] * lhs.source[1][2] * lhs.source[0][3])/det,
-        (lhs.source[0][0] * lhs.source[3][2] * lhs.source[1][3]+lhs.source[1][0] * lhs.source[2][0] * lhs.source[3][3] +
-        lhs.source[3][0] * lhs.source[1][2] * lhs.source[0][3] - lhs.source[0][0] * lhs.source[1][2] * lhs.source[3][3] -
-        lhs.source[1][0] * lhs.source[3][2] * lhs.source[0][3] - lhs.source[3][0] * lhs.source[2][0] * lhs.source[1][3])/det,
-        (lhs.source[0][0] * lhs.source[1][1] * lhs.source[3][3]+lhs.source[1][0] * lhs.source[3][1] * lhs.source[0][3] +
-        lhs.source[3][0] * lhs.source[0][1] * lhs.source[1][3] - lhs.source[0][0] * lhs.source[3][1] * lhs.source[1][3] -
-        lhs.source[1][0] * lhs.source[0][1] * lhs.source[3][3] - lhs.source[3][0] * lhs.source[1][1] * lhs.source[0][3])/det,
-        (lhs.source[0][0] * lhs.source[3][1] * lhs.source[1][2]+lhs.source[1][0] * lhs.source[0][1] * lhs.source[3][2] +
-        lhs.source[3][0] * lhs.source[1][1] * lhs.source[2][0] - lhs.source[0][0] * lhs.source[1][1] * lhs.source[3][2] -
-        lhs.source[1][0] * lhs.source[3][1] * lhs.source[2][0] - lhs.source[3][0] * lhs.source[0][1] * lhs.source[1][2])/det],
-        [(lhs.source[0][1] * lhs.source[2][2] * lhs.source[1][3]+lhs.source[1][1] * lhs.source[2][0] * lhs.source[2][3] +
-        lhs.source[2][1] * lhs.source[1][2] * lhs.source[0][3] - lhs.source[0][1] * lhs.source[1][2] * lhs.source[2][3] -
-        lhs.source[1][1] * lhs.source[2][2] * lhs.source[0][3] - lhs.source[2][1] * lhs.source[2][0] * lhs.source[1][3])/det,
-        (lhs.source[0][0] * lhs.source[1][2] * lhs.source[2][3]+lhs.source[1][0] * lhs.source[2][2] * lhs.source[0][3] +
-        lhs.source[2][0] * lhs.source[2][0] * lhs.source[1][3] - lhs.source[0][0] * lhs.source[2][2] * lhs.source[1][3] -
-        lhs.source[1][0] * lhs.source[2][0] * lhs.source[2][3] - lhs.source[2][0] * lhs.source[1][2] * lhs.source[0][3])/det,
-        (lhs.source[0][0] * lhs.source[2][1] * lhs.source[1][3]+lhs.source[1][0] * lhs.source[0][1] * lhs.source[2][3] +
-        lhs.source[2][0] * lhs.source[1][1] * lhs.source[0][3] - lhs.source[0][0] * lhs.source[1][1] * lhs.source[2][3] -
-        lhs.source[1][0] * lhs.source[2][1] * lhs.source[0][3] - lhs.source[2][0] * lhs.source[0][1] * lhs.source[1][3])/det,
-        (lhs.source[0][0] * lhs.source[1][1] * lhs.source[2][2]+lhs.source[1][0] * lhs.source[2][1] * lhs.source[2][0] +
-        lhs.source[2][0] * lhs.source[0][1] * lhs.source[1][2] - lhs.source[0][0] * lhs.source[2][1] * lhs.source[1][2] -
-        lhs.source[1][0] * lhs.source[0][1] * lhs.source[2][2] - lhs.source[2][0] * lhs.source[1][1] * lhs.source[2][0])/det]];
-        return m;
     }
 
 
     pub fn mul(lhs: &mat4, rhs: &mat4) -> mat4 {
+        return mat4::new(
+                lhs[11]*rhs[11]+
+                lhs[12]*rhs[21]+
+                lhs[13]*rhs[31]+
+                lhs[14]*rhs[41],
 
-        return mat4{source:[
-            [
-                lhs.source[0][0]*rhs.source[0][0]+
-                lhs.source[1][0]*rhs.source[1][0]+
-                lhs.source[2][0]*rhs.source[2][0]+
-                lhs.source[3][0]*rhs.source[3][0],
+                lhs[11]*rhs[12]+
+                lhs[12]*rhs[22]+
+                lhs[13]*rhs[32]+
+                lhs[14]*rhs[42],
 
-                lhs.source[0][0]*rhs.source[0][1]+
-                lhs.source[1][0]*rhs.source[1][1]+
-                lhs.source[2][0]*rhs.source[2][1]+
-                lhs.source[3][0]*rhs.source[3][1],
+                lhs[11]*rhs[13]+
+                lhs[12]*rhs[23]+
+                lhs[13]*rhs[33]+
+                lhs[14]*rhs[43],
 
-                lhs.source[0][0]*rhs.source[0][2]+
-                lhs.source[1][0]*rhs.source[1][2]+
-                lhs.source[2][0]*rhs.source[2][2]+
-                lhs.source[3][0]*rhs.source[3][2],
+                lhs[11]*rhs[14]+
+                lhs[12]*rhs[24]+
+                lhs[13]*rhs[34]+
+                lhs[14]*rhs[44],
 
-                lhs.source[0][0]*rhs.source[0][3]+
-                lhs.source[1][0]*rhs.source[1][3]+
-                lhs.source[2][0]*rhs.source[2][3]+
-                lhs.source[3][0]*rhs.source[3][3],
-            ],
-            [
-                lhs.source[0][1]*rhs.source[0][0]+
-                lhs.source[1][1]*rhs.source[1][0]+
-                lhs.source[2][1]*rhs.source[2][0]+
-                lhs.source[3][1]*rhs.source[3][0],
+                lhs[21]*rhs[11]+
+                lhs[22]*rhs[21]+
+                lhs[23]*rhs[31]+
+                lhs[24]*rhs[41],
 
-                lhs.source[0][1]*rhs.source[0][1]+
-                lhs.source[1][1]*rhs.source[1][1]+
-                lhs.source[2][1]*rhs.source[2][1]+
-                lhs.source[3][1]*rhs.source[3][1],
+                lhs[21]*rhs[12]+
+                lhs[22]*rhs[22]+
+                lhs[23]*rhs[32]+
+                lhs[24]*rhs[42],
 
-                lhs.source[0][1]*rhs.source[0][2]+
-                lhs.source[1][1]*rhs.source[1][2]+
-                lhs.source[2][1]*rhs.source[2][2]+
-                lhs.source[3][1]*rhs.source[3][2],
+                lhs[21]*rhs[13]+
+                lhs[22]*rhs[23]+
+                lhs[23]*rhs[33]+
+                lhs[24]*rhs[43],
 
-                lhs.source[0][1]*rhs.source[0][3]+
-                lhs.source[1][1]*rhs.source[1][3]+
-                lhs.source[2][1]*rhs.source[2][3]+
-                lhs.source[3][1]*rhs.source[3][3],
-            ],
-            [
-                lhs.source[0][2]*rhs.source[0][0]+
-                lhs.source[1][2]*rhs.source[1][0]+
-                lhs.source[2][2]*rhs.source[2][0]+
-                lhs.source[3][2]*rhs.source[3][0],
+                lhs[21]*rhs[14]+
+                lhs[22]*rhs[24]+
+                lhs[23]*rhs[34]+
+                lhs[24]*rhs[44],
 
-                lhs.source[0][2]*rhs.source[0][1]+
-                lhs.source[1][2]*rhs.source[1][1]+
-                lhs.source[2][2]*rhs.source[2][1]+
-                lhs.source[3][2]*rhs.source[3][1],
+                lhs[31]*rhs[11]+
+                lhs[32]*rhs[21]+
+                lhs[33]*rhs[31]+
+                lhs[34]*rhs[41],
 
-                lhs.source[0][2]*rhs.source[0][2]+
-                lhs.source[1][2]*rhs.source[1][2]+
-                lhs.source[2][2]*rhs.source[2][2]+
-                lhs.source[3][2]*rhs.source[3][2],
+                lhs[31]*rhs[12]+
+                lhs[32]*rhs[22]+
+                lhs[33]*rhs[32]+
+                lhs[34]*rhs[42],
 
-                lhs.source[0][2]*rhs.source[0][3]+
-                lhs.source[1][2]*rhs.source[1][3]+
-                lhs.source[2][2]*rhs.source[2][3]+
-                lhs.source[3][2]*rhs.source[3][3],
-            ],
-            [
-                lhs.source[0][3]*rhs.source[0][0]+
-                lhs.source[1][3]*rhs.source[1][0]+
-                lhs.source[2][3]*rhs.source[2][0]+
-                lhs.source[3][3]*rhs.source[3][0],
+                lhs[31]*rhs[13]+
+                lhs[32]*rhs[23]+
+                lhs[33]*rhs[33]+
+                lhs[34]*rhs[43],
 
-                lhs.source[0][3]*rhs.source[0][1]+
-                lhs.source[1][3]*rhs.source[1][1]+
-                lhs.source[2][3]*rhs.source[2][1]+
-                lhs.source[3][3]*rhs.source[3][1],
+                lhs[31]*rhs[14]+
+                lhs[32]*rhs[24]+
+                lhs[33]*rhs[34]+
+                lhs[34]*rhs[44],
 
-                lhs.source[0][3]*rhs.source[0][2]+
-                lhs.source[1][3]*rhs.source[1][2]+
-                lhs.source[2][3]*rhs.source[2][2]+
-                lhs.source[3][3]*rhs.source[3][2],
+                lhs[41]*rhs[11]+
+                lhs[42]*rhs[21]+
+                lhs[43]*rhs[31]+
+                lhs[44]*rhs[41],
 
-                lhs.source[0][3]*rhs.source[0][3]+
-                lhs.source[1][3]*rhs.source[1][3]+
-                lhs.source[2][3]*rhs.source[2][3]+
-                lhs.source[3][3]*rhs.source[3][3],
-            ]
-        ]};
+                lhs[41]*rhs[12]+
+                lhs[42]*rhs[22]+
+                lhs[43]*rhs[32]+
+                lhs[44]*rhs[42],
+
+                lhs[41]*rhs[13]+
+                lhs[42]*rhs[23]+
+                lhs[43]*rhs[33]+
+                lhs[44]*rhs[43],
+
+                lhs[41]*rhs[14]+
+                lhs[42]*rhs[24]+
+                lhs[43]*rhs[34]+
+                lhs[44]*rhs[44] );
+    }
+
+
+    pub fn mul_vec(lhs: &mat4, rhs: &vec3) -> vec3 {
+        return vec3::new(
+                lhs[11]*rhs[1]+
+                lhs[12]*rhs[2]+
+                lhs[13]*rhs[3]+
+                lhs[14],
+
+                lhs[11]*rhs[1]+
+                lhs[12]*rhs[2]+
+                lhs[13]*rhs[3]+
+                lhs[14],
+
+                lhs[11]*rhs[1]+
+                lhs[12]*rhs[2]+
+                lhs[13]*rhs[3]+
+                lhs[14]);
     }
 
     pub fn div(lhs: &mat4, rhs: &mat4) -> mat4 {
         let m2 = mat4::inverse(&rhs);
         return mat4::mul(&lhs, &m2);
     }
-
-
-
 
     pub fn ortho(top: f32, right: f32, bottom: f32, left: f32, near: f32, far: f32)->mat4{
 

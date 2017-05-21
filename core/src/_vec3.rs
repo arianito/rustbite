@@ -5,6 +5,32 @@ pub struct vec3 {
     pub source: [f32; 3]
 }
 
+
+impl std::ops::Index<usize> for vec3 {
+     type Output = f32;
+
+     fn index(&self, idx: usize) -> &f32 {
+        match idx {
+            1 => return &self.source[0],
+            2 => return &self.source[1],
+            3 => return &self.source[2],
+            _ => return &self.source[0]
+        }
+    }
+}
+
+
+impl std::ops::IndexMut<usize> for vec3 {
+     fn index_mut(&mut self, idx: usize) -> &mut f32 {
+        match idx {
+            1 => return &mut self.source[0],
+            2 => return &mut self.source[1],
+            3 => return &mut self.source[2],
+            _ => return &mut self.source[0]
+        }
+    }
+}
+
 impl std::ops::Add for vec3{
     type Output = vec3;
 
@@ -80,7 +106,7 @@ impl vec3 {
         return self.sqr_mag().sqrt();
     }
     pub fn sqr_mag(&self) -> f32{
-        return self.source[0]*self.source[0]+self.source[1]*self.source[1]+self.source[2]*self.source[2];
+        return self[1]*self[1]+self[2]*self[2]+self[3]*self[3];
     }
     pub fn norm(&self) -> vec3 {
         return vec3::div(self, self.mag());
@@ -97,28 +123,28 @@ impl vec3 {
     }
     pub fn cross(lhs: &vec3, rhs: &vec3) -> vec3{
         return vec3::new(
-            lhs.source[1] * rhs.source[2] - lhs.source[2] * rhs.source[1],
-            lhs.source[0] * rhs.source[2] - lhs.source[2] * rhs.source[0],
-            lhs.source[0] * rhs.source[1] - lhs.source[1] * rhs.source[0]
+            lhs[2] * rhs[3] - lhs[3] * rhs[2],
+            lhs[1] * rhs[3] - lhs[3] * rhs[1],
+            lhs[1] * rhs[2] - lhs[2] * rhs[1]
         );
     }
     pub fn dot(lhs: &vec3, rhs: &vec3) -> f32{
-        return lhs.source[0] * rhs.source[0]+lhs.source[1] * rhs.source[1]+lhs.source[2] * rhs.source[2];
+        return lhs[1]*rhs[1] + lhs[2]+rhs[2] * lhs[3]+rhs[3];
     }
     pub fn distance(lhs: &vec3, rhs: &vec3) -> f32{
         return vec3::sub(&rhs, &lhs).mag();
     }
     pub fn add(lhs: &vec3, rhs: &vec3) -> vec3 {
-        return vec3 { source: [ lhs.source[0]+rhs.source[0],lhs.source[1]+rhs.source[1],lhs.source[2]+rhs.source[2] ] };
+        return vec3 { source: [ lhs[1]+rhs[1],lhs[2]+rhs[2],lhs[3]+rhs[3] ] };
     }
     pub fn sub(lhs: &vec3, rhs: &vec3) -> vec3 {
-        return vec3 { source: [ lhs.source[0]-rhs.source[0],lhs.source[1]-rhs.source[1],lhs.source[2]-rhs.source[2] ] };
+        return vec3 { source: [ lhs[1]-rhs[1],lhs[2]-rhs[2],lhs[3]-rhs[3] ] };
     }
     pub fn mul(lhs: &vec3, factor: f32) -> vec3 {
-        return vec3 { source: [ lhs.source[0]*factor,lhs.source[1]*factor,lhs.source[2]*factor ] };
+        return vec3 { source: [ lhs[1]*factor,lhs[2]*factor,lhs[3]*factor ] };
     }
     pub fn div(lhs: &vec3, factor: f32) -> vec3 {
-        return vec3 { source: [ lhs.source[0]/factor,lhs.source[1]/factor,lhs.source[2]/factor ] };
+        return vec3 { source: [ lhs[1]/factor,lhs[2]/factor,lhs[3]/factor ] };
     }
     pub fn equals(lhs: &vec3, rhs: &vec3) -> bool {
         return if lhs.source == rhs.source {true} else {false};

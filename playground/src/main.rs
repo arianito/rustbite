@@ -9,6 +9,14 @@ use core::{
 
 fn main() {
 
+
+    let qz = quat::from_angle_axis(90.0, &vec3::forward());
+
+    qz.print();
+
+
+    quat::from_roatation_matrix(&qz.to_rotation_matrix()).print();
+
     let mut mx: f32 = 0.0;
     let mut my: f32 = 0.0;
 
@@ -81,7 +89,9 @@ fn main() {
         let mut target = display.draw();
         target.clear_color_and_depth((0.04, 0.09, 0.2, 1.0), 1.0);
 
-        model = mat4::create_trs(&vec3::new(0.0,0.0,0.0), &quat::from_angle_axis((my/mx).atan() * core::RAD2_DEG, &vec3::forward()), &vec3::one());
+        
+        
+        model = mat4::create_trs(&vec3::new(mx/100.0, -my/100.0,0.0), &quat::identify(), &vec3::one());
 
         let uniforms = uniform! {
             model: model.source,
