@@ -1,8 +1,8 @@
 # Welcome To Project rust-game
-In the past 10 years I was very passionate about building my own game, so I tried many different game engines, I tried them, played with them, build tiny games with them, but you know they are very complete and very mature and well architected! I can't deny that they're all great!
-but I really like to build my game very simple and clean there should be a structure for engine that you could read! the game pattern that you could understand, when game engines become larger and larger they become heavier to understand, I'm trying to build a game engine as simple as possible so everybody could understand it and be able to efficiently scale it and make it larger but it should keep it's simplicity. for those who just want to make a game, todays game engine are just okay.
+In the past 10 years I was very passionate about building my own game, so I tried many different game engines, I tried them, played with them, build tiny games with them, but you know they are very complex and very mature and well architected! I can't deny that they're all great!
+but I really like to build my own game very simple and clean there should be a structure for engine that you could read! the game pattern that you could understand, when game engines become larger and larger they become harder to understand, I'm trying to build a game engine as simple as possible so everybody could understand and be able to efficiently scale and make it larger make it their own, while game engine it self keeping it's simplicity. for those who just want to make a game, todays game engine are just fine.
 
-So, we are building a game engine here and I'm willing that everybody who came here, learn something, share some code, and become more knowledged about computer graphics, mathematics and other cool stuffs, also, I am really honored to start this project on GITHUB.
+So, we are building a game engine here and I'm willing that everybody who come across, learns something, share some code, and become more knowledged about computer graphics, mathematics and other cool stuffs, also, I am really honored to start this project on github.
 
 # Why RUST-LANG?
 I tried many different languages for my project, and non of them was a good choice and i always failed because there was always and block in my way, 
