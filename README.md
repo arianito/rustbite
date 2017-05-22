@@ -16,20 +16,23 @@ I tried many different languages for my project, and non of them was a good choi
 
 * with rust you are less concerned about memory and instead you can build something great.
 
+# Project Goals
 
-# Project Crates
+* [ ] 2D/3D hybrid game engine
+* [ ] Object based system
+* [ ] Multi-Level transformation support (each object could have multiple children and every child is also an object, every component like physics, logics, rendering, colliders, should get attached to objects)
+* [ ] Multi camera support
+* [ ] Simple Animation tools
+* [ ] Sprite Rendering, Mesh Rendering
+* [ ] Physic 2d support
+* [ ] Rendering tools
+* [ ] Particle system
+* [ ] GUI Support
+* [ ] Resource pipelining, asset manager
 
-| crate | use case |
-| --- | --- |
-| math::mat4 | matrices manupulation module! every game has a great one! everything you saw in the window are transform with matrices!|
-| math::vec3 | simple vector module! you know what vector is ?|
-| math::quat | quaternion of rotation, used when you want to rotate something in screen |
 
 
-| crate | use case |
-| --- | --- |
-| core::main | this is the main application, there is a simple window created by "tomaka.github.io/glium" crate, much like GLFW if you familiar with. |
-  
+
 
 # How To Start?
 ```
