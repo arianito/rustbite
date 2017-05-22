@@ -1,8 +1,9 @@
 use std;
-use _vec3::vec3;
-use _quat::quat;
+use vec3;
+use quat;
 
 
+#[derive(Copy, Clone)]
 pub struct mat4 {
     pub source: [[f32; 4]; 4]
 }
@@ -11,16 +12,113 @@ impl std::ops::Mul for mat4{
     type Output = mat4;
 
     fn mul(self, other: mat4) -> mat4 {
-        mat4::mul_mat(&self, &other)
+        return mat4::new(
+                self[11]*other[11]+
+                self[12]*other[21]+
+                self[13]*other[31]+
+                self[14]*other[41],
+
+                self[11]*other[12]+
+                self[12]*other[22]+
+                self[13]*other[32]+
+                self[14]*other[42],
+
+                self[11]*other[13]+
+                self[12]*other[23]+
+                self[13]*other[33]+
+                self[14]*other[43],
+
+                self[11]*other[14]+
+                self[12]*other[24]+
+                self[13]*other[34]+
+                self[14]*other[44],
+
+                self[21]*other[11]+
+                self[22]*other[21]+
+                self[23]*other[31]+
+                self[24]*other[41],
+
+                self[21]*other[12]+
+                self[22]*other[22]+
+                self[23]*other[32]+
+                self[24]*other[42],
+
+                self[21]*other[13]+
+                self[22]*other[23]+
+                self[23]*other[33]+
+                self[24]*other[43],
+
+                self[21]*other[14]+
+                self[22]*other[24]+
+                self[23]*other[34]+
+                self[24]*other[44],
+
+                self[31]*other[11]+
+                self[32]*other[21]+
+                self[33]*other[31]+
+                self[34]*other[41],
+
+                self[31]*other[12]+
+                self[32]*other[22]+
+                self[33]*other[32]+
+                self[34]*other[42],
+
+                self[31]*other[13]+
+                self[32]*other[23]+
+                self[33]*other[33]+
+                self[34]*other[43],
+
+                self[31]*other[14]+
+                self[32]*other[24]+
+                self[33]*other[34]+
+                self[34]*other[44],
+
+                self[41]*other[11]+
+                self[42]*other[21]+
+                self[43]*other[31]+
+                self[44]*other[41],
+
+                self[41]*other[12]+
+                self[42]*other[22]+
+                self[43]*other[32]+
+                self[44]*other[42],
+
+                self[41]*other[13]+
+                self[42]*other[23]+
+                self[43]*other[33]+
+                self[44]*other[43],
+
+                self[41]*other[14]+
+                self[42]*other[24]+
+                self[43]*other[34]+
+                self[44]*other[44] );
     }
 }
 
 impl std::ops::Mul<vec3> for mat4{
     type Output = vec3;
     fn mul(self, other: vec3) -> vec3 {
-        mat4::mul_vec(&self, &other)
+        
+        return vec3::new(
+                self[11]*other[1]+
+                self[12]*other[2]+
+                self[13]*other[3]+
+                self[14],
+
+                self[21]*other[1]+
+                self[22]*other[2]+
+                self[23]*other[3]+
+                self[24],
+
+                self[31]*other[1]+
+                self[32]*other[2]+
+                self[33]*other[3]+
+                self[34]);
+
     }
 }
+
+
 
 
 impl std::ops::Index<usize> for mat4 {
@@ -118,7 +216,7 @@ impl mat4 {
             ]
         };
     }
-    pub fn create_translation(a: &vec3)->mat4{
+    pub fn create_translation(a: vec3)->mat4{
         return mat4{
             source: [
                 [1.0f32, 0.0f32, 0.0f32, 0.0],
@@ -128,10 +226,10 @@ impl mat4 {
             ]
         };
     }
-    pub fn create_rotation(q: &quat)->mat4{
+    pub fn create_rotation(q: quat)->mat4{
         return q.to_rotation_matrix();
     }
-    pub fn create_scale(a: &vec3)->mat4{
+    pub fn create_scale(a: vec3)->mat4{
         return mat4{
             source: [
                 [a[1], 0.0f32  , 0.0f32, 0.0f32],
@@ -142,12 +240,12 @@ impl mat4 {
         };
     }
 
-    pub fn create_trs(position: &vec3, quaternion: &quat, scale: &vec3)->mat4{
-        return mat4::create_scale(&scale) * mat4::create_rotation(&quaternion) * mat4::create_translation(&position);
+    pub fn create_trs(position: vec3, quaternion: quat, scale: vec3)->mat4{
+        return mat4::create_scale(scale) * mat4::create_rotation(quaternion) * mat4::create_translation(position);
     }
 
 
-    pub fn determinant(lhs: &mat4) -> f32 {
+    pub fn determinant(lhs: mat4) -> f32 {
         return  lhs[11] * lhs[22] * lhs[33] * lhs[44] -
                 lhs[11] * lhs[22] * lhs[34] * lhs[43] -
                 lhs[11] * lhs[23] * lhs[32] * lhs[44] +
@@ -174,7 +272,7 @@ impl mat4 {
                 lhs[14] * lhs[23] * lhs[32] * lhs[41];
     }
 
-    pub fn transpose(lhs: &mat4) -> mat4 {
+    pub fn transpose(lhs: mat4) -> mat4 {
         return mat4::new(
             lhs[11],lhs[21],lhs[31],lhs[41],
             lhs[12],lhs[22],lhs[32],lhs[42],
@@ -183,8 +281,8 @@ impl mat4 {
         );
     }
 
-    pub fn inverse(lhs: &mat4) -> mat4 {
-        let det = mat4::determinant(&lhs);
+    pub fn inverse(lhs: mat4) -> mat4 {
+        let det = mat4::determinant(lhs);
         if det == 0.0 {
             return mat4::identify(1.0);
         } else {
@@ -256,112 +354,8 @@ impl mat4 {
         }
     }
 
-
-    pub fn mul_mat(lhs: &mat4, rhs: &mat4) -> mat4 {
-        return mat4::new(
-                lhs[11]*rhs[11]+
-                lhs[12]*rhs[21]+
-                lhs[13]*rhs[31]+
-                lhs[14]*rhs[41],
-
-                lhs[11]*rhs[12]+
-                lhs[12]*rhs[22]+
-                lhs[13]*rhs[32]+
-                lhs[14]*rhs[42],
-
-                lhs[11]*rhs[13]+
-                lhs[12]*rhs[23]+
-                lhs[13]*rhs[33]+
-                lhs[14]*rhs[43],
-
-                lhs[11]*rhs[14]+
-                lhs[12]*rhs[24]+
-                lhs[13]*rhs[34]+
-                lhs[14]*rhs[44],
-
-                lhs[21]*rhs[11]+
-                lhs[22]*rhs[21]+
-                lhs[23]*rhs[31]+
-                lhs[24]*rhs[41],
-
-                lhs[21]*rhs[12]+
-                lhs[22]*rhs[22]+
-                lhs[23]*rhs[32]+
-                lhs[24]*rhs[42],
-
-                lhs[21]*rhs[13]+
-                lhs[22]*rhs[23]+
-                lhs[23]*rhs[33]+
-                lhs[24]*rhs[43],
-
-                lhs[21]*rhs[14]+
-                lhs[22]*rhs[24]+
-                lhs[23]*rhs[34]+
-                lhs[24]*rhs[44],
-
-                lhs[31]*rhs[11]+
-                lhs[32]*rhs[21]+
-                lhs[33]*rhs[31]+
-                lhs[34]*rhs[41],
-
-                lhs[31]*rhs[12]+
-                lhs[32]*rhs[22]+
-                lhs[33]*rhs[32]+
-                lhs[34]*rhs[42],
-
-                lhs[31]*rhs[13]+
-                lhs[32]*rhs[23]+
-                lhs[33]*rhs[33]+
-                lhs[34]*rhs[43],
-
-                lhs[31]*rhs[14]+
-                lhs[32]*rhs[24]+
-                lhs[33]*rhs[34]+
-                lhs[34]*rhs[44],
-
-                lhs[41]*rhs[11]+
-                lhs[42]*rhs[21]+
-                lhs[43]*rhs[31]+
-                lhs[44]*rhs[41],
-
-                lhs[41]*rhs[12]+
-                lhs[42]*rhs[22]+
-                lhs[43]*rhs[32]+
-                lhs[44]*rhs[42],
-
-                lhs[41]*rhs[13]+
-                lhs[42]*rhs[23]+
-                lhs[43]*rhs[33]+
-                lhs[44]*rhs[43],
-
-                lhs[41]*rhs[14]+
-                lhs[42]*rhs[24]+
-                lhs[43]*rhs[34]+
-                lhs[44]*rhs[44] );
-    }
-
-
-    pub fn mul_vec(lhs: &mat4, rhs: &vec3) -> vec3 {
-        return vec3::new(
-                lhs[11]*rhs[1]+
-                lhs[12]*rhs[2]+
-                lhs[13]*rhs[3]+
-                lhs[14],
-
-                lhs[21]*rhs[1]+
-                lhs[22]*rhs[2]+
-                lhs[23]*rhs[3]+
-                lhs[24],
-
-                lhs[31]*rhs[1]+
-                lhs[32]*rhs[2]+
-                lhs[33]*rhs[3]+
-                lhs[34]);
-    }
-
-    pub fn div(lhs: &mat4, rhs: &mat4) -> mat4 {
-        let m2 = mat4::inverse(&rhs);
-        return mat4::mul_mat(&lhs, &m2);
+    pub fn div(lhs: mat4, rhs: mat4) -> mat4 {
+        return lhs * mat4::inverse(rhs);
     }
 
     pub fn ortho(top: f32, right: f32, bottom: f32, left: f32, near: f32, far: f32)->mat4{
@@ -378,8 +372,8 @@ impl mat4 {
     }
 
     pub fn ortho_window(unit: f32, ratio: f32, near: f32, far: f32)->mat4{
-        let w = unit * ratio;
-        let h = unit;
+        let w = unit;
+        let h = unit / ratio;
 
         return mat4::ortho(h, w, -h, -w, near, far);
     }

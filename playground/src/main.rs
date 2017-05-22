@@ -1,3 +1,4 @@
+#![allow(non_camel_case_types)]
 #[macro_use]
 extern crate glium;
 extern crate rustbite;
@@ -11,7 +12,6 @@ fn main() {
 
     let mut mx: f32 = 0.0;
     let mut my: f32 = 0.0;
-
 
     let mut sw: f32 = 500.0;
     let mut sh: f32 = 500.0;
@@ -27,15 +27,17 @@ fn main() {
         .unwrap();
 
 
-    let view = mat4::create_trs(&vec3::zero(), &quat::from_angle_axis(45.0, &vec3::forward()) ,&(vec3::one() / 5.0));
-    let mut projection = mat4::ortho_window(2.0, sw/sh, 200.0, -0.1);
+    let view = mat4::create_trs(vec3::zero(), quat::identify() , vec3::one() / 5.0);
+    let mut projection = mat4::ortho_window(2.0, sw/sh, -0.1, 200.0);
 
 
+    
     #[derive(Copy, Clone)]
-    struct Vertex {
-        position: [f32; 3],
+    pub struct vert {
+        position: [f32; 3]
     }
-    implement_vertex!(Vertex, position);
+
+    implement_vertex!(vert, position);
 
 
     let vertex_shader_src = r#"
@@ -62,32 +64,29 @@ fn main() {
         }
     "#;
 
-    let program =
-        glium::Program::from_source(&display, vertex_shader_src, fragment_shader_src, None)
-            .unwrap();
+    let program = glium::Program::from_source(&display, vertex_shader_src, fragment_shader_src, None).unwrap();
 
 
-    let vertex1 = Vertex { position: [-1.0, -1.0, 0.0] };
-    let vertex2 = Vertex { position: [1.0, 1.0, 0.0] };
-    let vertex3 = Vertex { position: [-1.0, 1.0, 0.0] };
-    
-    let vertex4 = Vertex { position: [-1.0, -1.0, 0.0] };
-    let vertex5 = Vertex { position: [1.0, -1.0, 0.0] };
-    let vertex6 = Vertex { position: [-1.0, 1.0, 0.0] };
-
-    let shape = vec![vertex1, vertex2, vertex3, vertex4, vertex5, vertex6];
+    let shape = vec![
+        vert { position:[-1.0, -1.0, 0.0]},
+        vert { position:[1.0, 1.0, 0.0]},
+        vert { position:[-1.0, 1.0, 0.0]},
+    ];
 
     let vertex_buffer = glium::VertexBuffer::new(&display, &shape).unwrap();
-    let indices = glium::index::NoIndices(glium::index::PrimitiveType::TrianglesList);
+    let indices = glium::index::NoIndices(glium::index::PrimitiveType::TriangleStrip);
 
     let mut t: f32 = 0.0f32;
     loop {
         let mut target = display.draw();
         target.clear_color_and_depth((0.04, 0.09, 0.2, 1.0), 1.0);
 
-        let mvc =  mat4::inverse(&view) * vec3::new(mx/sw*2.0-2.0, -my/sh*2.0+2.0, 0.0);
 
-        model = mat4::create_trs(&mvc, &quat::identify(), &vec3::one());
+        let rat = 2.0 * sh/sw;
+
+        let mvc =  mat4::inverse(view) * vec3::new(mx/sw*2.0-2.0, -my/sh*rat+rat, 0.0);
+
+        model = mat4::create_trs(mvc, quat::identify(), vec3::one());
     
 
         let uniforms = uniform! {
@@ -113,9 +112,10 @@ fn main() {
             match ev {
                 glium::glutin::Event::Closed => return,
                 glium::glutin::Event::Resized(w, h) => {
-                    sw = w as f32;
-                    sh = h as f32;
-                    projection = mat4::ortho_window(2.0, w as f32 / h as f32, 200.0, -0.1);
+                    sw = w as f32 / 2.0;
+                    sh = h as f32 / 2.0;
+                    println!("{}, {}", sw, sh);
+                    projection = mat4::ortho_window(2.0, sw / sh, -0.1, 200.0);
                 },
                 glium::glutin::Event::MouseMoved(x, y) => {
                     mx = x as f32;

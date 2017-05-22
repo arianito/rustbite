@@ -1,6 +1,7 @@
 use std;
-use PI;
+use math;
 
+#[derive(Copy, Clone)]
 pub struct vec3 {
     pub source: [f32; 3]
 }
@@ -35,7 +36,7 @@ impl std::ops::Add for vec3{
     type Output = vec3;
 
     fn add(self, other: vec3) -> vec3 {
-        vec3::add(&self, &other)
+        return vec3 { source: [ self[1]+other[1],self[2]+other[2],self[3]+other[3] ] };
     }
 }
 
@@ -45,7 +46,17 @@ impl std::ops::Div<f32> for vec3{
     type Output = vec3;
 
     fn div(self, other: f32) -> vec3 {
-        vec3::div(&self, other)
+        return vec3 { source: [ self[1]/other,self[2]/other,self[3]/other ] };
+    }
+}
+
+
+
+impl std::ops::Mul<f32> for vec3{
+    type Output = vec3;
+
+    fn mul(self, other: f32) -> vec3 {
+        return vec3 { source: [ self[1]*other,self[2]*other,self[3]*other ] };
     }
 }
 
@@ -54,7 +65,7 @@ impl std::ops::Sub for vec3{
     type Output = vec3;
 
     fn sub(self, other: vec3) -> vec3 {
-        vec3::sub(&self, &other)
+        return vec3 { source: [ self[1]-other[1],self[2]-other[2],self[3]-other[3] ] };
     }
 }
 
@@ -113,50 +124,39 @@ impl vec3 {
         return vec3 { source: self.source};
     }
     pub fn mag(&self) -> f32{
-        return self.sqr_mag().sqrt();
+        return math::sqrt(self.sqr_mag());
     }
     pub fn sqr_mag(&self) -> f32{
         return self[1]*self[1]+self[2]*self[2]+self[3]*self[3];
     }
-    pub fn norm(&self) -> vec3 {
-        return vec3::div(self, self.mag());
+    pub fn norm(self) -> vec3 {
+        return self / self.mag();
     }
     // statics
-    pub fn angle(from: &vec3, to: &vec3) -> f32{
+    pub fn angle(from: vec3, to: vec3) -> f32{
         let div = from.mag() * to.mag();
-        let dot = vec3::dot(&from, &to);
+        let dot = vec3::dot(from, to);
         if div == 0.0f32 || dot == 0.0f32 {
-            return self::PI;
+            return math::PI;
         }
         let da = dot / div;
-        return da.acos();
+        return math::acos(da);
     }
-    pub fn cross(lhs: &vec3, rhs: &vec3) -> vec3{
+    pub fn cross(lhs: vec3, rhs: vec3) -> vec3{
         return vec3::new(
             lhs[2] * rhs[3] - lhs[3] * rhs[2],
             lhs[1] * rhs[3] - lhs[3] * rhs[1],
             lhs[1] * rhs[2] - lhs[2] * rhs[1]
         );
     }
-    pub fn dot(lhs: &vec3, rhs: &vec3) -> f32{
+    pub fn dot(lhs: vec3, rhs: vec3) -> f32{
         return lhs[1]*rhs[1] + lhs[2]+rhs[2] * lhs[3]+rhs[3];
     }
-    pub fn distance(lhs: &vec3, rhs: &vec3) -> f32{
-        return vec3::sub(&rhs, &lhs).mag();
+    pub fn distance(lhs: vec3, rhs: vec3) -> f32{
+        return (rhs - lhs).mag();
     }
-    pub fn add(lhs: &vec3, rhs: &vec3) -> vec3 {
-        return vec3 { source: [ lhs[1]+rhs[1],lhs[2]+rhs[2],lhs[3]+rhs[3] ] };
-    }
-    pub fn sub(lhs: &vec3, rhs: &vec3) -> vec3 {
-        return vec3 { source: [ lhs[1]-rhs[1],lhs[2]-rhs[2],lhs[3]-rhs[3] ] };
-    }
-    pub fn mul(lhs: &vec3, factor: f32) -> vec3 {
-        return vec3 { source: [ lhs[1]*factor,lhs[2]*factor,lhs[3]*factor ] };
-    }
-    pub fn div(lhs: &vec3, factor: f32) -> vec3 {
-        return vec3 { source: [ lhs[1]/factor,lhs[2]/factor,lhs[3]/factor ] };
-    }
-    pub fn equals(lhs: &vec3, rhs: &vec3) -> bool {
+   
+    pub fn equals(lhs: vec3, rhs: vec3) -> bool {
         return if lhs.source == rhs.source {true} else {false};
     }
     // debug

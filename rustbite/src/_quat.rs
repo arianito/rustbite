@@ -1,9 +1,10 @@
 
 use std;
-use DEG2_RAD;
+use math;
 use _vec3::vec3;
 use _mat4::mat4;
 
+#[derive(Copy, Clone)]
 pub struct quat {
     pub source: [f32; 4]
 }
@@ -36,28 +37,86 @@ impl std::ops::IndexMut<usize> for quat {
     }
 }
 
+
+impl std::ops::Mul for quat{
+    type Output = quat;
+
+    fn mul(self, other: quat) -> quat {
+        quat {
+            source:    [self[4] * other[1] + self[1] * other[4] + self[2] * other[3] - self[3] * other[2],
+                        self[4] * other[2] + self[2] * other[4] + self[3] * other[1] - self[1] * other[3],
+                        self[4] * other[3] + self[3] * other[4] + self[1] * other[2] - self[2] * other[1],
+                        self[4] * other[4] - self[1] * other[1] - self[2] * other[2] - self[3] * other[3]]
+        }
+    }
+}
+
+
+
+impl std::ops::Add for quat{
+    type Output = quat;
+
+    fn add(self, other: quat) -> quat {
+        quat {
+            source:[self[1]+other[1], self[2]+other[2], self[3]+other[3], self[4]+other[4]]
+        }
+    }
+}
+
+impl std::ops::Sub for quat{
+    type Output = quat;
+
+    fn sub(self, other: quat) -> quat {
+        quat {
+            source:[self[1]-other[1], self[2]-other[2], self[3]-other[3], self[4]-other[4]]
+        }
+    }
+}
+
+
+
 impl quat {
 
     pub fn identify() -> quat{
         return quat {source: [0.0,0.0,0.0,10.0]};
     }
 
-    pub fn from_angle_axis(degree: f32,axis: &vec3) -> quat{
-        let angle = degree * self::DEG2_RAD;
+    pub fn from_angle_axis(degree: f32,axis: vec3) -> quat{
+        let angle = degree * math::DEG2_RAD;
         let ha = 0.5*angle;
-        let sn = ha.sin();
+        let sn = math::sin(ha);
 
         return quat{
             source: [
                 sn * axis[1],
                 sn * axis[2],
                 sn * axis[3],
-                ha.cos()
+                math::cos(ha)
             ]
         };
     }
 
-    pub fn from_roatation_matrix(m : &mat4) -> quat {
+    pub fn to_angle_axis(&self) -> (f32, vec3) {
+        let sqr = self[1]*self[1] + self[2]*self[2] + self[3]*self[3];
+        if sqr > 0.0 {
+            let invl = math::inv_sqrt(sqr);
+            return (
+                2.0*math::acos(self[4]) * math::RAD2_DEG,
+                vec3::new(
+                    self[1]*invl,
+                    self[2]*invl,
+                    self[3]*invl
+                )
+            );
+        }
+        
+        return (
+            0.0,
+            vec3::zero()
+        );
+    }
+
+    pub fn from_roatation_matrix(m : mat4) -> quat {
 
 
         let mut q = quat::identify();
@@ -66,7 +125,7 @@ impl quat {
 
         if trc > 0.0
         {
-            rt = (trc + 1.0).sqrt();
+            rt = math::sqrt(trc + 1.0);
             q[4] = 0.5*rt;
             rt = 0.5/rt;
             q[1] = (m[23]-m[32])*rt;
@@ -86,7 +145,7 @@ impl quat {
             let j: usize = sn[i];
             let k: usize = sn[j];
 
-            rt = (m.source[i][i]-m.source[j][j]-m.source[k][k] + 1.0).sqrt();
+            rt = math::sqrt(m.source[i][i]-m.source[j][j]-m.source[k][k] + 1.0);
 
             q[i+1] = 0.5*rt;
             rt = 0.5/rt;

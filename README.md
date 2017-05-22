@@ -16,6 +16,8 @@ I tried many different languages for my project, and non of them was a good choi
 
 * with rust you are less concerned about memory and instead you can build something great.
 
+# Resources
+http://www.euclideanspace.com/
 # Project Goals
 
 * [ ] 2D/3D hybrid game engine
