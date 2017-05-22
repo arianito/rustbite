@@ -9,14 +9,6 @@ use core::{
 
 fn main() {
 
-
-    let mtz = mat4::new(2.0,5.0,0.0,0.0,
-                        0.0,0.0,1.0,0.0,
-                        1.0,0.0,7.0,0.0,
-                        0.0,0.0,0.0,8.0);
-
-    (mat4::inverse(&mtz) * mtz.clone()).print();
-
     let mut mx: f32 = 0.0;
     let mut my: f32 = 0.0;
 
@@ -35,7 +27,7 @@ fn main() {
         .unwrap();
 
 
-    let view = mat4::identify(1.0);
+    let view = mat4::create_trs(&vec3::zero(), &quat::from_angle_axis(45.0, &vec3::forward()) ,&(vec3::one() / 5.0));
     let mut projection = mat4::ortho_window(2.0, sw/sh, 200.0, -0.1);
 
 
@@ -93,7 +85,7 @@ fn main() {
         let mut target = display.draw();
         target.clear_color_and_depth((0.04, 0.09, 0.2, 1.0), 1.0);
 
-        let mvc = vec3::new(mx/sw*2.0-2.0, -my/sh*2.0+2.0, 0.0);
+        let mvc =  mat4::inverse(&view) * vec3::new(mx/sw*2.0-2.0, -my/sh*2.0+2.0, 0.0);
 
         model = mat4::create_trs(&mvc, &quat::identify(), &vec3::one());
     
