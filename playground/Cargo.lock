@@ -2,8 +2,8 @@
 name = "playground"
 version = "0.1.0"
 dependencies = [
- "core 0.1.0",
  "glium 0.16.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rustbite 0.1.0",
 ]
 
 [[package]]
@@ -90,10 +90,6 @@ dependencies = [
  "libc 0.2.22 (registry+https://github.com/rust-lang/crates.io-index)",
  "objc 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
-
-[[package]]
-name = "core"
-version = "0.1.0"
 
 [[package]]
 name = "core-foundation"
@@ -381,6 +377,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "libc 0.2.22 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
+
+[[package]]
+name = "rustbite"
+version = "0.1.0"
 
 [[package]]
 name = "rustc-demangle"

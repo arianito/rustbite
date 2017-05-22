@@ -1,4 +1,4 @@
-# Welcome To Project rust-game
+# Welcome To Project Rust-Bite
 In the past 10 years I was very passionate about building my own game, so I tried many different game engines, I tried them, played with them, build tiny games with them, but you know they are very complex and very mature and well architected! I can't deny that they're all great!
 but I really like to build my own game very simple and clean there should be a structure for engine that you could read! the game pattern that you could understand, when game engines become larger and larger they become harder to understand, I'm trying to build a game engine as simple as possible so everybody could understand and be able to efficiently scale and make it larger make it their own, while game engine it self keeping it's simplicity. for those who just want to make a game, todays game engine are just fine.
 

@@ -6,4 +6,4 @@ authors = ["Aryan <alikhaniaryan@live.com>"]
 
 [dependencies]
 glium = "*"
-core = {path = "../core"}
+rustbite = {path = "../rustbite"}

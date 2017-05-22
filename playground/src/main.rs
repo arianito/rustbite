@@ -1,9 +1,9 @@
 #[macro_use]
 extern crate glium;
-extern crate core;
+extern crate rustbite;
 
 
-use core::{
+use rustbite::{
     vec3, mat4, quat
 };
 
