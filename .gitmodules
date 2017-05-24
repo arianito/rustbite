@@ -1,3 +1,6 @@
 [submodule "glutin"]
 	path = glutin
 	url = https://github.com/tomaka/glutin
+[submodule "gl-rs"]
+	path = gl-rs
+	url = https://github.com/brendanzab/gl-rs
