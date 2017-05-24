@@ -1,24 +1,21 @@
 use glutin;
 use gl;
+use std;
 
 pub struct app {
-    pub init: Option<fn()>,
-    pub update: Option<fn()>
+    pub init: fn(),
+    pub create: fn(),
+    pub update: fn()
 }
 
 impl app {
-    pub fn new()-> app {
-        return app {
-            init: None,
-            update: None
-        };
-    }
-
     pub fn run(&mut self) {
         
+        (self.init)();
+
         let events_loop = glutin::EventsLoop::new();
         let window = glutin::WindowBuilder::new()
-            .with_title("A fantastic window!")
+            .with_title("Rustbite")
             .with_vsync()
             .build(&events_loop)
             .unwrap();
@@ -32,25 +29,17 @@ impl app {
         }
 
 
+        (self.create)();
+        
+
         events_loop.run_forever(|event| {
-            
-                
             unsafe {
                 gl::Clear(gl::COLOR_BUFFER_BIT);
             }
-
             window.swap_buffers().unwrap();
 
+            (self.update)();
 
-
-
-
-            match self.update {
-                Some(x) => x(),
-                None => return,
-            }
-
-            
             match event {
                 glutin::Event::WindowEvent { event: glutin::WindowEvent::Closed, .. } =>
                     events_loop.interrupt(),
@@ -58,10 +47,6 @@ impl app {
             }
         });
 
-        match self.init {
-            Some(x) => x(),
-            None => return,
-        }
 
     }
 }

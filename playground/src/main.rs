@@ -2,21 +2,55 @@
 #[macro_use]
 extern crate rustbite;
 
-use rustbite::{vec3, mat4, quat, app};
+use rustbite::{vec3, mat4, quat, app, shader};
 
 
 fn main() {
-    let mut x = app::new();
+    
 
-    fn init() {
-        println!("{}", "init");
+    let shd = shader::new(b"
+        #version 140
+
+        in vec3 position;
+
+        uniform mat4 model;
+        uniform mat4 view;
+        uniform mat4 projection;
+
+        void main() {
+            gl_Position = projection * view * model * vec4(position, 1.0);
+        }
+    \0",b"
+        #version 140
+        out vec4 color;
+        void main() {
+            color = vec4(1,1,0,0.5);
+        }
+    \0");
+
+    fn init(){
+        println!("{}", "initialized.");
     }
-    fn update() {
-        
+
+    fn create(){
+        println!("{}", "created.");
+
+        // shd.compile();
     }
-    x.init = Some(init);
-    x.update = Some(update);
+
+    fn update(){
+
+    }
+
+
+    let mut x = app{
+        init: init,
+        create: create,
+        update: update
+    };
+
     x.run();
+
 }
 
 
