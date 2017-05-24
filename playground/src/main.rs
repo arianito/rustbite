@@ -8,7 +8,7 @@ use rustbite::{vec3, mat4, quat, app, shader};
 fn main() {
     
 
-    let shd = shader::new(b"
+    let shd = std::rc::Rc::new(shader::new(b"
         #version 140
 
         in vec3 position;
@@ -26,21 +26,25 @@ fn main() {
         void main() {
             color = vec4(1,1,0,0.5);
         }
-    \0");
+    \0"));
 
-    fn init(){
+    
+    
+
+    let init = Box::new(|| {
         println!("{}", "initialized.");
-    }
+    });
 
-    fn create(){
+    let data = shd.clone();
+
+    let create = Box::new(move || {
         println!("{}", "created.");
-
-        // shd.compile();
-    }
-
-    fn update(){
-
-    }
+        data.compile();
+    });
+    
+    let update = Box::new(move || {
+        
+    });
 
 
     let mut x = app{

@@ -2,13 +2,13 @@ use glutin;
 use gl;
 use std;
 
-pub struct app {
-    pub init: fn(),
-    pub create: fn(),
-    pub update: fn()
+pub struct app<'a> {
+    pub init: Box<Fn() + 'a>,
+    pub create: Box<Fn() + 'a>,
+    pub update: Box<Fn() + 'a>,
 }
 
-impl app {
+impl<'a> app<'a> {
     pub fn run(&mut self) {
         
         (self.init)();
