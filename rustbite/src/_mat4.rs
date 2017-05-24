@@ -240,10 +240,42 @@ impl mat4 {
         };
     }
 
+    
+
     pub fn create_trs(position: vec3, quaternion: quat, scale: vec3)->mat4{
-        return mat4::create_scale(scale) * mat4::create_rotation(quaternion) * mat4::create_translation(position);
+        return  mat4::create_translation(position) * mat4::create_scale(scale) * mat4::create_rotation(quaternion);
     }
 
+
+
+    pub fn create_translation2(a: &vec3)->mat4{
+        return mat4{
+            source: [
+                [1.0f32, 0.0f32, 0.0f32, 0.0],
+                [0.0f32, 1.0f32, 0.0f32, 0.0],
+                [0.0f32, 0.0f32, 1.0f32, 0.0],
+                [a[1], a[2], a[3], 1.0f32]
+            ]
+        };
+    }
+    pub fn create_rotation2(q: &quat)->mat4{
+        return q.to_rotation_matrix();
+    }
+    pub fn create_scale2(a: &vec3)->mat4{
+        return mat4{
+            source: [
+                [a[1], 0.0f32  , 0.0f32, 0.0f32],
+                [0.0f32    , a[2], 0.0f32, 0.0f32],
+                [0.0f32    , 0.0f32  , a[3], 0.0f32],
+                [0.0f32    , 0.0f32  , 0.0f32, 1.0f32]
+            ]
+        };
+    }
+
+
+    pub fn create_trs2(position: &vec3, quaternion: &quat, scale: &vec3)->mat4{
+        return  mat4::create_translation2(&position) * mat4::create_scale2(&scale) * mat4::create_rotation2(&quaternion);
+    }
 
     pub fn determinant(lhs: mat4) -> f32 {
         return  lhs[11] * lhs[22] * lhs[33] * lhs[44] -
@@ -376,19 +408,6 @@ impl mat4 {
         let h = unit / ratio;
 
         return mat4::ortho(h, w, -h, -w, near, far);
-    }
-
-
-    // debug
-    pub fn clone(&self) -> mat4{
-        return mat4{
-            source: [
-                [self.source[0][0], self.source[0][1],self.source[0][2],self.source[0][3]],
-                [self.source[1][0], self.source[1][1],self.source[1][2],self.source[1][3]],
-                [self.source[2][0], self.source[2][1],self.source[2][2],self.source[2][3]],
-                [self.source[3][0], self.source[3][1],self.source[3][2],self.source[3][3]],
-            ]
-        };
     }
     // debug
     pub fn print(&self) {

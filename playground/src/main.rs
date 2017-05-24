@@ -1,40 +1,92 @@
 #![allow(non_camel_case_types)]
 #[macro_use]
-extern crate glium;
 extern crate rustbite;
 
+use rustbite::{vec3, mat4, quat, app};
 
-use rustbite::{
-    vec3, mat4, quat
-};
 
 fn main() {
+    let mut x = app::new();
 
+    fn init() {
+        println!("{}", "init");
+    }
+    fn update() {
+        
+    }
+    x.init = Some(init);
+    x.update = Some(update);
+    x.run();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+    let nw = time::now().tm_nsec;
+    for i in 0..5000{
+        let m = mat4::create_trs(vec3::zero(), quat::identify(), vec3::one());
+
+        let mut m2= mat4::inverse(m);
+        m2  = m2 * m;
+        m2  = m2 * m;
+        m2  = m2 * m;
+        m2  = m2 * m;
+        m2  = mat4::create_trs(vec3::zero(), quat::identify(), vec3::one());
+        m2= mat4::inverse(m2);
+    }
+    let ok = (time::now().tm_nsec - nw) as f32 /1000000.0;
+    println!("{}ms", ok);
+
+    return;
+
+
+/*
+    let mut model: mat4;
+    let view = mat4::create_trs(vec3::zero(), quat::identify(), vec3::one());
+    let mut projection = mat4::ortho_window(2.0, sw / sh, -0.1, 200.0);
+
+    */
+
+
+    
     let mut mx: f32 = 0.0;
     let mut my: f32 = 0.0;
 
     let mut sw: f32 = 500.0;
     let mut sh: f32 = 500.0;
 
-    let mut model: mat4;
 
     use glium::{DisplayBuild, Surface};
     let display = glium::glutin::WindowBuilder::new()
         .with_dimensions(sw as u32, sh as u32)
         .with_multisampling(4)
         .with_title("rust-game")
+        .with_vsync()
         .build_glium()
         .unwrap();
 
 
-    let view = mat4::create_trs(vec3::zero(), quat::identify() , vec3::one() / 5.0);
-    let mut projection = mat4::ortho_window(2.0, sw/sh, -0.1, 200.0);
 
 
-    
     #[derive(Copy, Clone)]
     pub struct vert {
-        position: [f32; 3]
+        position: [f32; 3],
     }
 
     implement_vertex!(vert, position);
@@ -64,14 +116,14 @@ fn main() {
         }
     "#;
 
-    let program = glium::Program::from_source(&display, vertex_shader_src, fragment_shader_src, None).unwrap();
+    let program =
+        glium::Program::from_source(&display, vertex_shader_src, fragment_shader_src, None)
+            .unwrap();
 
 
-    let shape = vec![
-        vert { position:[-1.0, -1.0, 0.0]},
-        vert { position:[1.0, 1.0, 0.0]},
-        vert { position:[-1.0, 1.0, 0.0]},
-    ];
+    let shape = vec![vert { position: [-1.0, -1.0, 0.0] },
+                     vert { position: [1.0, 1.0, 0.0] },
+                     vert { position: [-1.0, 1.0, 0.0] }];
 
     let vertex_buffer = glium::VertexBuffer::new(&display, &shape).unwrap();
     let indices = glium::index::NoIndices(glium::index::PrimitiveType::TriangleStrip);
@@ -79,15 +131,15 @@ fn main() {
     let mut t: f32 = 0.0f32;
     loop {
         let mut target = display.draw();
-        target.clear_color_and_depth((0.04, 0.09, 0.2, 1.0), 1.0);
+        target.clear_color_and_depth((t%1.0, 0.09, 0.2, 1.0), 1.0);
 
 
-        let rat = 2.0 * sh/sw;
+        let rat = 2.0 * sh / sw;
 
-        let mvc =  mat4::inverse(view) * vec3::new(mx/sw*2.0-2.0, -my/sh*rat+rat, 0.0);
+        let mvc = mat4::inverse(view) * vec3::new(mx / sw * 2.0 - 2.0, -my / sh * rat + rat, 0.0);
 
-        model = mat4::create_trs(mvc, quat::identify(), vec3::one());
-    
+        model = mat4::create_trs(mvc, quat::from_angle_axis(t, vec3::forward()), vec3::one());
+
 
         let uniforms = uniform! {
             model: model.source,
@@ -101,11 +153,16 @@ fn main() {
             blend: glium::Blend::alpha_blending(),
             ..Default::default()
         };
+
+        
+
         target
             .draw(&vertex_buffer, &indices, &program, &uniforms, &params)
             .unwrap();
 
-        t = t + 0.01;
+            
+
+        t = t + 0.1;
         target.finish().unwrap();
 
         for ev in display.poll_events() {
@@ -116,13 +173,15 @@ fn main() {
                     sh = h as f32 / 2.0;
                     println!("{}, {}", sw, sh);
                     projection = mat4::ortho_window(2.0, sw / sh, -0.1, 200.0);
-                },
+                }
                 glium::glutin::Event::MouseMoved(x, y) => {
                     mx = x as f32;
                     my = y as f32;
-                },
+                }
                 _ => (),
             }
         }
     }
-}
+
+
+    */

@@ -5,5 +5,4 @@ authors = ["Aryan <alikhaniaryan@live.com>"]
 
 
 [dependencies]
-glium = "*"
 rustbite = {path = "../rustbite"}

@@ -119,10 +119,6 @@ impl vec3 {
             source: [a, b, c]
         };
     }
-    // members
-    pub fn clone(&self) -> vec3{
-        return vec3 { source: self.source};
-    }
     pub fn mag(&self) -> f32{
         return math::sqrt(self.sqr_mag());
     }
