@@ -2,6 +2,7 @@
 name = "playground"
 version = "0.1.0"
 dependencies = [
+ "gl 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustbite 0.1.0",
 ]
 

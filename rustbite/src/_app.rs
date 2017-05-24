@@ -18,7 +18,7 @@ impl<'a> app<'a> {
             .with_title("Rustbite")
             .build(&events_loop)
             .unwrap();
-            
+
         let _ = unsafe { window.make_current() };
 
 
@@ -32,12 +32,18 @@ impl<'a> app<'a> {
         
 
         events_loop.run_forever(|event| {
-            unsafe {
+
+
+            unsafe{
+                gl::ClearColor(0.1, 0.15, 0.2, 1.0);
                 gl::Clear(gl::COLOR_BUFFER_BIT);
             }
-            window.swap_buffers().unwrap();
 
             (self.update)();
+
+            window.swap_buffers().unwrap();
+
+
 
             match event {
                 glutin::Event::WindowEvent { event: glutin::WindowEvent::Closed, .. } =>

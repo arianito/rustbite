@@ -4,7 +4,7 @@ use std;
 pub struct shader {
     vertex_shader: &'static [u8],
     fragment_shader: &'static [u8],
-    program: gl::types::GLuint
+    pub program: gl::types::GLuint
 }
 
 impl shader {
@@ -30,13 +30,12 @@ impl shader {
             self.program = gl::CreateProgram();
             gl::AttachShader(self.program, vs);
             gl::AttachShader(self.program, fs);
-            gl::LinkProgram(self.program);
         }
     }
 
-    pub fn use_here(&self) {
-        unsafe {
-            gl::UseProgram(self.program);
-        }
+    pub unsafe fn use_here(&self) {
+
+        gl::LinkProgram(self.program);
+        gl::UseProgram(self.program);
     }
 }

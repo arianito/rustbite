@@ -1,7 +1,20 @@
 #![allow(non_camel_case_types)]
 extern crate rustbite;
+extern crate gl;
 
 use rustbite::{vec3, mat4, quat, app, shader};
+
+use std::sync::Arc;
+use std::sync::Mutex;
+
+use std::mem;
+use std::ptr;
+
+static VERTEX_DATA: [f32; 9] = [
+    -0.5, -0.5, 0.0,
+    0.0, 0.5, 0.0,
+    0.5, -0.5, 0.0
+];
 
 
 fn main() {
@@ -11,39 +24,73 @@ fn main() {
     let view = mat4::create_trs(vec3::zero(), quat::identify(), vec3::one());
     let mut projection = mat4::ortho_window(2.0, 1.0, -0.1, 200.0);
 
-    let mut sim = shader::new(b"
-        #version 140
+    
+
+    let sim = Arc::new(Mutex::new(shader::new(b"
+        #version 150
 
         in vec3 position;
 
-        uniform mat4 model;
-        uniform mat4 view;
-        uniform mat4 projection;
-
         void main() {
-            gl_Position = projection * view * model * vec4(position, 1.0);
+            gl_Position = vec4(position, 1.0);
         }
     \0",b"
-        #version 140
-        out vec4 color;
-        void main() {
-            color = vec4(1,1,0,0.5);
+        #version 150
+
+        out vec4 outColor;
+
+        void main()
+        {
+            outColor = vec4(1.0, 1.0, 1.0, 1.0);
         }
-    \0");
+    \0")));
 
 
     let init = Box::new(|| {
 
     });
 
-    let create = Box::new(|| {
-        sim.compile();
+    let sim1 = sim.clone();
+
+    let create = Box::new(move || {
+
+
+        let mut data = sim1.lock().unwrap();
+        data.compile();
+
+
+        unsafe {
+            data.use_here();
+
+            let mut vb = mem::uninitialized();
+            gl::GenBuffers(1, &mut vb);
+            gl::BindBuffer(gl::ARRAY_BUFFER, vb);
+            gl::BufferData(gl::ARRAY_BUFFER,
+                            (VERTEX_DATA.len() * mem::size_of::<f32>()) as gl::types::GLsizeiptr,
+                            VERTEX_DATA.as_ptr() as *const _, gl::STATIC_DRAW);
+
+            if gl::BindVertexArray::is_loaded() {
+                let mut vao = mem::uninitialized();
+                gl::GenVertexArrays(1, &mut vao);
+                gl::BindVertexArray(vao);
+            }
+
+            let pos_attrib = gl::GetAttribLocation(data.program, b"position\0".as_ptr() as *const _);
+            gl::VertexAttribPointer(pos_attrib as gl::types::GLuint, 3, gl::FLOAT,  gl::FALSE, 0, ptr::null());
+            gl::EnableVertexAttribArray(pos_attrib as gl::types::GLuint);
+        }
+
     });
 
-    let update = Box::new(|| {
-        
+    let sim2 = sim.clone();
+    let update = Box::new(move || {
+        let mut data = sim2.lock().unwrap();
+
+        unsafe {
+            gl::DrawArrays(gl::TRIANGLES, 0, 3);
+        }
     });
-    
+
     let mut x = app {
         init: init,
         create: create,
