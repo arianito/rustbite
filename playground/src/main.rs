@@ -1,14 +1,17 @@
 #![allow(non_camel_case_types)]
-#[macro_use]
 extern crate rustbite;
 
 use rustbite::{vec3, mat4, quat, app, shader};
 
 
 fn main() {
-    
 
-    let shd = std::rc::Rc::new(shader::new(b"
+
+    let mut model: mat4;
+    let view = mat4::create_trs(vec3::zero(), quat::identify(), vec3::one());
+    let mut projection = mat4::ortho_window(2.0, 1.0, -0.1, 200.0);
+
+    let mut sim = shader::new(b"
         #version 140
 
         in vec3 position;
@@ -26,33 +29,26 @@ fn main() {
         void main() {
             color = vec4(1,1,0,0.5);
         }
-    \0"));
+    \0");
 
-    
-    
 
     let init = Box::new(|| {
-        println!("{}", "initialized.");
+
     });
 
-    let data = shd.clone();
-
-    let create = Box::new(move || {
-        println!("{}", "created.");
-        data.compile();
+    let create = Box::new(|| {
+        sim.compile();
     });
-    
-    let update = Box::new(move || {
+
+    let update = Box::new(|| {
         
     });
-
-
-    let mut x = app{
+    
+    let mut x = app {
         init: init,
         create: create,
         update: update
     };
-
     x.run();
 
 }
