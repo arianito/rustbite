@@ -16,6 +16,8 @@ impl<'a> app<'a> {
         let events_loop = glutin::EventsLoop::new();
         let window = glutin::WindowBuilder::new()
             .with_title("Rustbite")
+            .with_vsync()
+            .with_dimensions(400, 400)
             .build(&events_loop)
             .unwrap();
 
@@ -29,28 +31,28 @@ impl<'a> app<'a> {
 
 
         (self.create)();
-        
-
-        events_loop.run_forever(|event| {
-
-
-            unsafe{
+        let mut running = true;
+        while running {
+            events_loop.poll_events(|ev| {
+                match ev {
+                    glutin::Event::WindowEvent { event, .. } => match event {
+                        glutin::WindowEvent::Closed => running = false,
+                        glutin::WindowEvent::Resized(w, h) => {
+                            println!("{}, {}", w, h);
+                        },
+                        _ => (),
+                    },
+                    _ => (),
+                }
+            });
+            unsafe {
                 gl::ClearColor(0.1, 0.15, 0.2, 1.0);
                 gl::Clear(gl::COLOR_BUFFER_BIT);
             }
-
             (self.update)();
-
             window.swap_buffers().unwrap();
 
-
-
-            match event {
-                glutin::Event::WindowEvent { event: glutin::WindowEvent::Closed, .. } =>
-                    events_loop.interrupt(),
-                _ => ()
-            }
-        });
+        }
 
 
     }

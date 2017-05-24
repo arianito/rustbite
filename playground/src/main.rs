@@ -4,35 +4,34 @@ extern crate gl;
 
 use rustbite::{vec3, mat4, quat, app, shader};
 
-use std::sync::Arc;
-use std::sync::Mutex;
+use std::rc::Rc;
+use std::cell::RefCell;
 
 use std::mem;
 use std::ptr;
-
-static VERTEX_DATA: [f32; 9] = [
-    -0.5, -0.5, 0.0,
-    0.0, 0.5, 0.0,
-    0.5, -0.5, 0.0
-];
 
 
 fn main() {
 
 
     let mut model: mat4;
-    let view = mat4::create_trs(vec3::zero(), quat::identify(), vec3::one());
-    let mut projection = mat4::ortho_window(2.0, 1.0, -0.1, 200.0);
+    let mut view = Rc::new(RefCell::new(mat4::create_trs(vec3::zero(), quat::identify(), vec3::one())));
+    let mut projection = Rc::new(RefCell::new(mat4::ortho_window(4.0, 1.0, -0.1, 200.0)));
 
     
+    let mut i = Rc::new(RefCell::new(0.0_f32));
 
-    let sim = Arc::new(Mutex::new(shader::new(b"
+    let sim = Rc::new(RefCell::new(shader::new(b"
         #version 150
 
         in vec3 position;
 
+
+        uniform mat4 projection;
+        uniform mat4 view;
+
         void main() {
-            gl_Position = vec4(position, 1.0);
+            gl_Position = projection * view * vec4(position, 1.0);
         }
     \0",b"
         #version 150
@@ -41,7 +40,7 @@ fn main() {
 
         void main()
         {
-            outColor = vec4(1.0, 1.0, 1.0, 1.0);
+            outColor = vec4(1.0, 1.0, 1.0, 0.5);
         }
     \0")));
 
@@ -50,24 +49,47 @@ fn main() {
 
     });
 
-    let sim1 = sim.clone();
-
-    let create = Box::new(move || {
-
-
-        let mut data = sim1.lock().unwrap();
+    let create = Box::new(|| {
+        let mut data = sim.borrow_mut();
         data.compile();
+    });
 
+    let update = Box::new(|| {
+        let mut data = sim.borrow_mut();
+        let mut proj = projection.borrow_mut();
+        let mut viw = view.borrow_mut();
+
+        let mut g = i.borrow_mut();
+
+        
+
+        *viw = mat4::create_rotation(quat::from_angle_axis(*g, vec3::forward()));
+
+    
+        *g = *g + 1.0;
 
         unsafe {
             data.use_here();
 
+
+            
+
+            let vtx: [f32; 18] = [
+                -0.5, -0.5, 0.0,
+                0.0, 0.5, 0.0,
+                0.5, -0.5, 0.0,
+
+
+                 -0.5, 0.5, 0.0,
+                0.0, -0.5, 0.0,
+                0.5, 0.5, 0.0,
+                
+            ];
+
             let mut vb = mem::uninitialized();
             gl::GenBuffers(1, &mut vb);
             gl::BindBuffer(gl::ARRAY_BUFFER, vb);
-            gl::BufferData(gl::ARRAY_BUFFER,
-                            (VERTEX_DATA.len() * mem::size_of::<f32>()) as gl::types::GLsizeiptr,
-                            VERTEX_DATA.as_ptr() as *const _, gl::STATIC_DRAW);
+            gl::BufferData(gl::ARRAY_BUFFER, (vtx.len() * mem::size_of::<f32>()) as isize, vtx.as_ptr() as *const _, gl::STATIC_DRAW);
 
             if gl::BindVertexArray::is_loaded() {
                 let mut vao = mem::uninitialized();
@@ -78,16 +100,20 @@ fn main() {
             let pos_attrib = gl::GetAttribLocation(data.program, b"position\0".as_ptr() as *const _);
             gl::VertexAttribPointer(pos_attrib as gl::types::GLuint, 3, gl::FLOAT,  gl::FALSE, 0, ptr::null());
             gl::EnableVertexAttribArray(pos_attrib as gl::types::GLuint);
-        }
 
-    });
 
-    let sim2 = sim.clone();
-    let update = Box::new(move || {
-        let mut data = sim2.lock().unwrap();
+            let proj_attrib = gl::GetUniformLocation(data.program, b"projection\0".as_ptr() as *const _);
+            gl::UniformMatrix4fv(proj_attrib, 1, gl::FALSE, proj.source.as_ptr() as *const _);
 
-        unsafe {
-            gl::DrawArrays(gl::TRIANGLES, 0, 3);
+
+            let proj_attrib = gl::GetUniformLocation(data.program, b"view\0".as_ptr() as *const _);
+            gl::UniformMatrix4fv(proj_attrib, 1, gl::FALSE, viw.source.as_ptr() as *const _);
+
+
+            gl::Enable(gl::BLEND);
+            gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
+
+            gl::DrawArrays(gl::TRIANGLES, 0, 6);
         }
     });
 

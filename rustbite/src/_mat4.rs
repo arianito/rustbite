@@ -245,38 +245,7 @@ impl mat4 {
     pub fn create_trs(position: vec3, quaternion: quat, scale: vec3)->mat4{
         return  mat4::create_translation(position) * mat4::create_scale(scale) * mat4::create_rotation(quaternion);
     }
-
-
-
-    pub fn create_translation2(a: &vec3)->mat4{
-        return mat4{
-            source: [
-                [1.0f32, 0.0f32, 0.0f32, 0.0],
-                [0.0f32, 1.0f32, 0.0f32, 0.0],
-                [0.0f32, 0.0f32, 1.0f32, 0.0],
-                [a[1], a[2], a[3], 1.0f32]
-            ]
-        };
-    }
-    pub fn create_rotation2(q: &quat)->mat4{
-        return q.to_rotation_matrix();
-    }
-    pub fn create_scale2(a: &vec3)->mat4{
-        return mat4{
-            source: [
-                [a[1], 0.0f32  , 0.0f32, 0.0f32],
-                [0.0f32    , a[2], 0.0f32, 0.0f32],
-                [0.0f32    , 0.0f32  , a[3], 0.0f32],
-                [0.0f32    , 0.0f32  , 0.0f32, 1.0f32]
-            ]
-        };
-    }
-
-
-    pub fn create_trs2(position: &vec3, quaternion: &quat, scale: &vec3)->mat4{
-        return  mat4::create_translation2(&position) * mat4::create_scale2(&scale) * mat4::create_rotation2(&quaternion);
-    }
-
+    
     pub fn determinant(lhs: mat4) -> f32 {
         return  lhs[11] * lhs[22] * lhs[33] * lhs[44] -
                 lhs[11] * lhs[22] * lhs[34] * lhs[43] -
