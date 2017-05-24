@@ -19,6 +19,7 @@ impl app {
         let events_loop = glutin::EventsLoop::new();
         let window = glutin::WindowBuilder::new()
             .with_title("A fantastic window!")
+            .with_vsync()
             .build(&events_loop)
             .unwrap();
 
@@ -27,7 +28,7 @@ impl app {
 
         unsafe {
             gl::load_with(|symbol| window.get_proc_address(symbol) as *const _);
-            gl::ClearColor(1.0, 1.0, 0.0, 1.0);
+            gl::ClearColor(0.1, 0.15, 0.2, 1.0);
         }
 
 
@@ -35,7 +36,7 @@ impl app {
             
                 
             unsafe {
-                gl::Clear(gl::COLOR_BU  FFER_BIT);
+                gl::Clear(gl::COLOR_BUFFER_BIT);
             }
 
             window.swap_buffers().unwrap();
