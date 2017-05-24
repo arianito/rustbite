@@ -38,7 +38,7 @@ http://www.euclideanspace.com/
 
 # How To Start?
 ```
-git clone https://github.com/ary4n/rust-game/
+git clone --recursive https://github.com/ary4n/rust-game/
 cd playground
 cargo run
 ```
