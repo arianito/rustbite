@@ -51,7 +51,6 @@ impl<'a> app<'a> {
             }
             (self.update)();
             window.swap_buffers().unwrap();
-
         }
 
 

@@ -30,6 +30,7 @@ impl shader {
             self.program = gl::CreateProgram();
             gl::AttachShader(self.program, vs);
             gl::AttachShader(self.program, fs);
+            
         }
     }
 

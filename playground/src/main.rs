@@ -2,7 +2,7 @@
 extern crate rustbite;
 extern crate gl;
 
-use rustbite::{vec3, mat4, quat, app, shader};
+use rustbite::{vec3, mat4, quat, app, shader, math};
 
 use std::rc::Rc;
 use std::cell::RefCell;
@@ -14,9 +14,9 @@ use std::ptr;
 fn main() {
 
 
-    let mut model: mat4;
+    let mut model = Rc::new(RefCell::new(mat4::identify(1.0)));
     let mut view = Rc::new(RefCell::new(mat4::create_trs(vec3::zero(), quat::identify(), vec3::one())));
-    let mut projection = Rc::new(RefCell::new(mat4::ortho_window(4.0, 1.0, -0.1, 200.0)));
+    let mut projection = Rc::new(RefCell::new(mat4::ortho_window(1.0, 1.0, -0.1, 200.0)));
 
     
     let mut i = Rc::new(RefCell::new(0.0_f32));
@@ -25,22 +25,34 @@ fn main() {
         #version 150
 
         in vec3 position;
+        in vec4 color;
+        in vec2 texcoord;
+
+        out vec4 _color;
+        out vec2 _texcoord;
 
 
         uniform mat4 projection;
         uniform mat4 view;
+        uniform mat4 model;
 
         void main() {
-            gl_Position = projection * view * vec4(position, 1.0);
+            _color = color;
+            _texcoord = texcoord;
+            gl_Position = projection * view * model * vec4(position, 1.0);
         }
     \0",b"
         #version 150
 
+        in vec4 _color;
+        in vec2 _texcoord;
+
         out vec4 outColor;
+        uniform sampler2D tex;
 
         void main()
         {
-            outColor = vec4(1.0, 1.0, 1.0, 0.5);
+            outColor = texture(tex, _texcoord) * _color;
         }
     \0")));
 
@@ -52,68 +64,112 @@ fn main() {
     let create = Box::new(|| {
         let mut data = sim.borrow_mut();
         data.compile();
+
+
+        unsafe{
+
+            let vtx: [f32; 36] = [
+                -0.5, 0.5, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0,
+                0.5, 0.5, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0,
+                0.5, -0.5, 0.0, 0.0, 1.0, 1.0, 0.5, 1.0, 1.0,
+                -0.5, -0.5, 0.0, 1.0, 1.0, 1.0, 0.2, 0.0, 1.0
+            ];
+
+            let indc: [gl::types::GLuint; 6] = [
+                0, 1, 2,
+                2, 3, 0
+            ];
+
+            let mut vao = mem::uninitialized();
+            gl::GenVertexArrays(1, &mut vao);
+            gl::BindVertexArray(vao);
+
+
+            let mut vbo = mem::uninitialized();
+            gl::GenBuffers(1, &mut vbo);
+            gl::BindBuffer(gl::ARRAY_BUFFER, vbo);
+            gl::BufferData(gl::ARRAY_BUFFER, (vtx.len() * mem::size_of::<f32>()) as isize, vtx.as_ptr() as *const _, gl::STATIC_DRAW);
+
+
+            let mut ebo = mem::uninitialized();
+            gl::GenBuffers(1, &mut ebo);
+            gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, ebo);
+            gl::BufferData(gl::ELEMENT_ARRAY_BUFFER, (indc.len() * mem::size_of::<gl::types::GLuint>()) as isize, indc.as_ptr() as *const _, gl::STATIC_DRAW);
+
+            data.use_here();
+
+            let pos_attrib = gl::GetAttribLocation(data.program, b"position\0".as_ptr() as *const _);
+            gl::VertexAttribPointer(pos_attrib as gl::types::GLuint, 3, gl::FLOAT,  gl::FALSE, (9 * mem::size_of::<f32>()) as gl::types::GLsizei, ptr::null());
+            gl::EnableVertexAttribArray(pos_attrib as gl::types::GLuint);
+
+            let pos_attrib = gl::GetAttribLocation(data.program, b"color\0".as_ptr() as *const _);
+            gl::VertexAttribPointer(pos_attrib as gl::types::GLuint, 4, gl::FLOAT,  gl::FALSE, (9 * mem::size_of::<f32>()) as gl::types::GLsizei, (3 * mem::size_of::<f32>()) as *const () as *const _);
+            gl::EnableVertexAttribArray(pos_attrib as gl::types::GLuint);
+
+            let coord_attrib = gl::GetAttribLocation(data.program, b"texcoord\0".as_ptr() as *const _);
+            gl::VertexAttribPointer(coord_attrib as gl::types::GLuint, 2, gl::FLOAT,  gl::FALSE, (9 * mem::size_of::<f32>()) as gl::types::GLsizei, (7 * mem::size_of::<f32>()) as *const () as *const _);
+            gl::EnableVertexAttribArray(coord_attrib as gl::types::GLuint);
+
+
+            let mut texture = mem::uninitialized();
+
+            gl::GenTextures(1, &mut texture);
+            gl::ActiveTexture(gl::TEXTURE0);
+            gl::BindTexture(gl::TEXTURE_2D, texture);
+            
+            let pixels: [f32; 12] = [
+                0.0, 0.0, 0.0,   1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0,   0.0, 0.0, 0.0
+            ];
+            
+            gl::TexImage2D(gl::TEXTURE_2D, 0, gl::RGB as i32, 2, 2, 0, gl::RGB, gl::FLOAT, pixels.as_ptr() as *const _);
+            
+
+            gl::Uniform1i(gl::GetUniformLocation(data.program, b"tex".as_ptr() as *const _), 0);
+
+            gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::CLAMP_TO_EDGE as i32);
+            gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::CLAMP_TO_EDGE as i32);
+            gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as i32);
+            gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as i32);
+
+
+
+
+
+        }
     });
 
+    let mut m = 0.0;
     let update = Box::new(|| {
         let mut data = sim.borrow_mut();
         let mut proj = projection.borrow_mut();
-        let mut viw = view.borrow_mut();
-
-        let mut g = i.borrow_mut();
-
-        
-
-        *viw = mat4::create_rotation(quat::from_angle_axis(*g, vec3::forward()));
-
-    
-        *g = *g + 1.0;
-
-        unsafe {
-            data.use_here();
-
-
+        let viw = view.borrow_mut();
+        let mut mdl = model.borrow_mut();
             
 
-            let vtx: [f32; 18] = [
-                -0.5, -0.5, 0.0,
-                0.0, 0.5, 0.0,
-                0.5, -0.5, 0.0,
+        *mdl = mat4::create_rotation(quat::from_angle_axis(m, vec3::forward()));
 
-
-                 -0.5, 0.5, 0.0,
-                0.0, -0.5, 0.0,
-                0.5, 0.5, 0.0,
-                
-            ];
-
-            let mut vb = mem::uninitialized();
-            gl::GenBuffers(1, &mut vb);
-            gl::BindBuffer(gl::ARRAY_BUFFER, vb);
-            gl::BufferData(gl::ARRAY_BUFFER, (vtx.len() * mem::size_of::<f32>()) as isize, vtx.as_ptr() as *const _, gl::STATIC_DRAW);
-
-            if gl::BindVertexArray::is_loaded() {
-                let mut vao = mem::uninitialized();
-                gl::GenVertexArrays(1, &mut vao);
-                gl::BindVertexArray(vao);
-            }
-
-            let pos_attrib = gl::GetAttribLocation(data.program, b"position\0".as_ptr() as *const _);
-            gl::VertexAttribPointer(pos_attrib as gl::types::GLuint, 3, gl::FLOAT,  gl::FALSE, 0, ptr::null());
-            gl::EnableVertexAttribArray(pos_attrib as gl::types::GLuint);
-
-
+        m = m + 1.0;
+            
+        unsafe {
+        
             let proj_attrib = gl::GetUniformLocation(data.program, b"projection\0".as_ptr() as *const _);
             gl::UniformMatrix4fv(proj_attrib, 1, gl::FALSE, proj.source.as_ptr() as *const _);
 
 
-            let proj_attrib = gl::GetUniformLocation(data.program, b"view\0".as_ptr() as *const _);
-            gl::UniformMatrix4fv(proj_attrib, 1, gl::FALSE, viw.source.as_ptr() as *const _);
+            let view_attrib = gl::GetUniformLocation(data.program, b"view\0".as_ptr() as *const _);
+            gl::UniformMatrix4fv(view_attrib, 1, gl::FALSE, viw.source.as_ptr() as *const _);
+
+
+            let model_attrib = gl::GetUniformLocation(data.program, b"model\0".as_ptr() as *const _);
+            gl::UniformMatrix4fv(model_attrib, 1, gl::FALSE, mdl.source.as_ptr() as *const _);
 
 
             gl::Enable(gl::BLEND);
             gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
 
-            gl::DrawArrays(gl::TRIANGLES, 0, 6);
+            gl::DrawElements(gl::TRIANGLES, 6, gl::UNSIGNED_INT, ptr::null());
+
         }
     });
 
